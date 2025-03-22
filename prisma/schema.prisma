@@ -65,6 +65,7 @@ model MerchantAsset {
   name       String
   type       String
   url        String
+  publicId   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

@@ -23,29 +23,6 @@ router.get('/:merchantId/assets', requireUser, async (req: Request, res: Respons
   res.json(assets);
 });
 
-router.post('/:merchantId/assets', requireUser, async (req: Request, res: Response) => {
-  const { merchantId } = req.params;
-  const { userId } = req.auth;
-  const { name, type, url } = req.body;
-
-  const user = await prisma.merchantUser.findFirst({
-    where: { merchantId, userId: userId! },
-  });
-
-  if (!user) { res.status(403).json({ message: 'Forbidden' }); return; }
-
-  const asset = await prisma.merchantAsset.create({
-    data: {
-      merchantId,
-      name,
-      type,
-      url,
-    },
-  });
-
-  res.status(201).json(asset);
-});
-
 router.put('/:merchantId/assets/:assetId', requireUser, async (req: Request, res: Response) => {
   const { merchantId, assetId } = req.params;
   const { userId } = req.auth;
@@ -75,6 +52,16 @@ router.delete('/:merchantId/assets/:assetId', requireUser, async (req: Request, 
 
   if (!user) { res.status(403).json({ message: 'Forbidden' }); return; }
 
+  const asset = await prisma.merchantAsset.findUnique({
+    where: { id: assetId },
+  });
+
+  if (!asset) { res.status(404).json({ message: 'Asset not found' }); return; }
+
+  // Delete from Cloudinary
+  await cloudinary.uploader.destroy(asset.publicId);
+
+  // Delete from DB
   await prisma.merchantAsset.delete({
     where: { id: assetId },
   });
@@ -110,6 +97,7 @@ router.post('/:merchantId/assets/upload', requireUser, upload.single('file'), as
             name: result.original_filename,
             type: result.resource_type,
             url: result.secure_url,
+            publicId: result.public_id,
           },
         });
 
