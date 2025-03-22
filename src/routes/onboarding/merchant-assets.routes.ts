@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import prisma from '@/clients/prisma';
 import { requireUser } from '@/middleware/requireUser';
+import { upload } from '@/middleware/upload';
+import cloudinary from '@/clients/cloudinary';
 
 const router = Router();
 
@@ -78,6 +80,47 @@ router.delete('/:merchantId/assets/:assetId', requireUser, async (req: Request, 
   });
 
   res.json({ message: 'Asset deleted' });
+});
+
+router.post('/:merchantId/assets/upload', requireUser, upload.single('file'), async (req: Request, res: Response) => {
+  const { merchantId } = req.params;
+  const { userId } = req.auth;
+
+  const user = await prisma.merchantUser.findFirst({
+    where: { merchantId, userId: userId! },
+  });
+
+  if (!user) { { res.status(403).json({ message: 'Forbidden' }); return; } }
+
+  const file = req.file;
+
+  if (!file) { res.status(400).json({ message: 'No file uploaded' }); return; }
+
+  try {
+    const uploadResult = await cloudinary.uploader.upload_stream(
+      { folder: `merchant-assets/${merchantId}` },
+      async (error, result) => {
+        if (error || !result) {
+          return res.status(500).json({ message: 'Upload failed' });
+        }
+
+        const asset = await prisma.merchantAsset.create({
+          data: {
+            merchantId,
+            name: result.original_filename,
+            type: result.resource_type,
+            url: result.secure_url,
+          },
+        });
+
+        res.status(201).json(asset);
+      }
+    );
+
+    uploadResult.end(file.buffer);
+  } catch (err) {
+    res.status(500).json({ message: 'Upload error', error: err });
+  }
 });
 
 export default router;
