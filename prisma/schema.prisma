@@ -35,6 +35,30 @@ model Merchant {
   MerchantAsset MerchantAsset[]
 
   ApiKey ApiKey[]
+
+  ResourceTemplate ResourceTemplate[]
+
+  Resource Resource[]
+
+  Rate Rate[]
+
+  Discount Discount[]
+
+  BookingPageTemplate BookingPageTemplate[]
+
+  BookingPage BookingPage[]
+
+  PaymentActions PaymentActions[]
+
+  Customer Customer[]
+
+  BookingRequest BookingRequest[]
+
+  Booking Booking[]
+
+  AddOn AddOn[]
+
+  BookingRequestFlow BookingRequestFlow[]
 }
 
 model MerchantContact {
@@ -92,4 +116,383 @@ model ApiKey {
   merchantId String
   revoked    Boolean  @default(false)
   createdAt  DateTime @default(now())
+}
+
+model ResourceTemplate {
+  id         String    @id @default(cuid())
+  merchantId String?
+  merchant   Merchant? @relation(fields: [merchantId], references: [id])
+
+  name        String
+  category    String
+  description String?
+
+  defaultFields Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Resource Resource[]
+}
+
+model Resource {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  templateId String
+  template   ResourceTemplate @relation(fields: [templateId], references: [id])
+
+  name        String
+  description String?
+  capacity    Int
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Rate Rate[]
+
+  ResourceBookingConfig ResourceBookingConfig[]
+
+  BookingRequest BookingRequest[]
+
+  Booking Booking[]
+}
+
+model Rate {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  name        String
+  description String?
+
+  price    Decimal
+  currency String
+
+  durationType RateDurationType
+  isDefault    Boolean          @default(false)
+  isActive     Boolean          @default(true) // flag if this rate is usable
+
+  bookingStartDate DateTime?
+  bookingEndDate   DateTime?
+
+  usageStartDate DateTime?
+  usageEndDate   DateTime?
+
+  // ✅ Tax rules stay here (related to price)
+  taxType   TaxType @default(PERCENTAGE)
+  taxAmount Decimal @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Discount Discount[]
+
+  BookingRequest BookingRequest[]
+
+  Booking Booking[]
+}
+
+model ResourceBookingConfig {
+  id         String   @id @default(cuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  minDuration Int
+  maxDuration Int
+  bufferTime  Int
+
+  availableDays Json? // [{ day: "Monday", open: "09:00", close: "17:00" }]
+  blackoutDates Json? // ["2025-12-25", "2025-12-26"]
+
+  allowMultipleBookings Boolean @default(false)
+
+  // ✅ Cancellation policy belongs here
+  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
+  refundWindowHours  Int? // e.g. cancel up to 24 hours before
+
+  isActive Boolean @default(true) // resource booking on/off
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum RateDurationType {
+  PER_HOUR
+  PER_DAY
+  PER_NIGHT
+}
+
+enum CancellationPolicy {
+  FLEXIBLE // Full refund until X hours before
+  MODERATE // Partial refund until X hours before
+  STRICT // No refund
+}
+
+enum TaxType {
+  NONE
+  PERCENTAGE
+  FIXED
+}
+
+model Discount {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  code        String? // Optional if auto-applied
+  description String?
+
+  discountType DiscountType // PERCENTAGE or FIXED
+  amount       Decimal
+
+  appliesToRates Rate[] // Optional: connect to specific rates or leave global
+
+  usageLimit Int? // e.g., max 100 uses
+  usedCount  Int  @default(0)
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  resourceId String?
+  resource   Resource? @relation(fields: [resourceId], references: [id])
+
+  // Snapshots for integrity
+  resourceName String
+  resourceType String
+  location     String?
+
+  rateId String?
+  rate   Rate?   @relation(fields: [rateId], references: [id])
+
+  // Snapshots for integrity
+  rateName       String
+  ratePrice      Decimal
+  currency       String
+  taxAmount      Decimal
+  discountAmount Decimal
+  totalAmount    Decimal // Final price incl. tax/discount/addons
+
+  // Status
+  status BookingStatus @default(PENDING)
+
+  startTime DateTime
+  endTime   DateTime
+
+  // Payment/Checkout
+  paymentStatus PaymentStatus @default(PENDING)
+  paymentId     String? // Reference to payment transaction
+
+  // Additional
+  notes         String?
+  internalNotes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingAddOn   BookingAddOn[]
+  PaymentActions PaymentActions[]
+}
+
+model AddOn {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name        String
+  description String?
+  price       Decimal
+  currency    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BookingAddOn {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  addOnId    String
+  quantity   Int     @default(1)
+  totalPrice Decimal
+}
+
+model Customer {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name  String
+  email String
+  phone String?
+
+  address  String?
+  city     String?
+  postcode String?
+  country  String?
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingRequest BookingRequest[]
+}
+
+model BookingPageTemplate {
+  id              String  @id @default(cuid())
+  name            String
+  description     String?
+  previewImageUrl String? // Preview of template design
+  isSystem        Boolean @default(false)
+
+  merchantId String? // Null if it's a system template
+  merchant   Merchant? @relation(fields: [merchantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingPage BookingPage[]
+}
+
+model BookingPage {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name String
+  slug String @unique // Used for hosted page: yourplatform.com/m/{slug}
+
+  templateId String
+  template   BookingPageTemplate @relation(fields: [templateId], references: [id])
+
+  primaryColor   String // Branding
+  secondaryColor String
+  logoUrl        String?
+
+  customDomain String? // Optional: custom CNAME domain
+  isActive     Boolean @default(true)
+
+  config Json? // JSON blob for custom options: { showRatings: true, requireLogin: false }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model PaymentActions {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  provider          String // e.g., "stripe"
+  providerPaymentId String // external payment reference
+
+  amount   Decimal
+  currency String
+  status   PaymentStatus @default(PENDING)
+
+  refundedAmount Decimal @default(0)
+  paymentMethod  String? // e.g., "card", "wallet"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model BookingRequest {
+  id                 String   @id @default(cuid())
+  merchantId         String
+  merchant           Merchant @relation(fields: [merchantId], references: [id])
+
+  resourceId         String?
+  resource           Resource? @relation(fields: [resourceId], references: [id])
+
+  rateId             String?
+  rate               Rate? @relation(fields: [rateId], references: [id])
+
+  customerId         String?  // Optional, pre-fill for known customers
+  customer           Customer? @relation(fields: [customerId], references: [id])
+
+  startTime          DateTime?  // Optional pre-filled time
+  endTime            DateTime?
+
+  // Configuration
+  requirePayment     Boolean @default(false)
+  autoConfirm        Boolean @default(true)
+  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
+  refundWindowHours  Int?
+
+  expiresAt          DateTime?  // Optional: when this request is no longer valid
+  isActive           Boolean @default(true)
+
+  notes              String?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  BookingRequestFlow BookingRequestFlow[]
+}
+
+model BookingRequestFlow {
+  id                 String   @id @default(cuid())
+  bookingRequestId   String
+  bookingRequest     BookingRequest @relation(fields: [bookingRequestId], references: [id])
+
+  merchantId         String
+  merchant           Merchant @relation(fields: [merchantId], references: [id])
+
+  slug               String @unique  // Link slug for sharing: /book/{slug}
+
+  usageLimit         Int?   // Max number of times this flow can be used
+  usageCount         Int @default(0)
+
+  webhookUrl         String?  // Optional: notify when booking is completed
+  webhookEvents      Json?    // e.g., ["booking.created"]
+
+  isActive           Boolean @default(true)
+  expiresAt          DateTime?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
