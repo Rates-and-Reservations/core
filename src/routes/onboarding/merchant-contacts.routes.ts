@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import prisma from '@/clients/prisma';
-import { requireUser } from '@/middleware/requireUser';
+import { requireUser } from '@/middleware/requireUser.middleware';
 
 const router = Router();
 
