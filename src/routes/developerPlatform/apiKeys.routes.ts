@@ -45,7 +45,7 @@ router.post('/:merchantId/api-keys/:apiKeyId/revoke', requireUser, async (req: R
 
   await prisma.apiKey.update({
     where: { id: apiKeyId },
-    data: { revoked: true },
+    data: { isActive: false },
   });
 
   res.json({ message: 'API key revoked' });
@@ -67,7 +67,7 @@ router.post('/:merchantId/api-keys/:apiKeyId/rotate', requireUser, async (req: R
   // Revoke old key
   await prisma.apiKey.update({
     where: { id: apiKeyId },
-    data: { revoked: true },
+    data: { isActive: false },
   });
 
   // Generate new key

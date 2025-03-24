@@ -12,7 +12,7 @@ export const apiKeyAuth = async (req: Request, res: Response, next: NextFunction
   const apiKey = authHeader.replace('ApiKey ', '').trim();
 
   const keys = await prisma.apiKey.findMany({
-    where: { revoked: false },
+    where: { isActive: true },
     include: { merchant: true },
   });
 
