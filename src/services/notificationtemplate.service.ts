@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type NotificationTemplateCreateInput = Prisma.NotificationTemplateCreateInput;
+type NotificationTemplateUpdateInput = Prisma.NotificationTemplateUpdateInput;
+
+// Create NotificationTemplate
+export const createNotificationTemplate = async (data: NotificationTemplateCreateInput) => {
+  return prisma.notificationTemplate.create({
+    data,
+  });
+};
+
+// Get NotificationTemplate by ID
+export const getNotificationTemplateById = async (id: string) => {
+  return prisma.notificationTemplate.findUnique({
+    where: { id },
+  });
+};
+
+// List NotificationTemplates
+export const listNotificationTemplates = async (filter: any = {}) => {
+  return prisma.notificationTemplate.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update NotificationTemplate
+export const updateNotificationTemplate = async (id: string, data: NotificationTemplateUpdateInput) => {
+  return prisma.notificationTemplate.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete NotificationTemplate
+export const deleteNotificationTemplate = async (id: string) => {
+  return prisma.notificationTemplate.delete({
+    where: { id },
+  });
+};

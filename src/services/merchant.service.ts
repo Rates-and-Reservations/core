@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type MerchantCreateInput = Prisma.MerchantCreateInput;
+type MerchantUpdateInput = Prisma.MerchantUpdateInput;
+
+// Create Merchant
+export const createMerchant = async (data: MerchantCreateInput) => {
+  return prisma.merchant.create({
+    data,
+  });
+};
+
+// Get Merchant by ID
+export const getMerchantById = async (id: string) => {
+  return prisma.merchant.findUnique({
+    where: { id },
+  });
+};
+
+// List Merchants
+export const listMerchants = async (filter: any = {}) => {
+  return prisma.merchant.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update Merchant
+export const updateMerchant = async (id: string, data: MerchantUpdateInput) => {
+  return prisma.merchant.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete Merchant
+export const deleteMerchant = async (id: string) => {
+  return prisma.merchant.delete({
+    where: { id },
+  });
+};

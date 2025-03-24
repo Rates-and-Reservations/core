@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type ResourceTemplateCreateInput = Prisma.ResourceTemplateCreateInput;
+type ResourceTemplateUpdateInput = Prisma.ResourceTemplateUpdateInput;
+
+// Create ResourceTemplate
+export const createResourceTemplate = async (data: ResourceTemplateCreateInput) => {
+  return prisma.resourceTemplate.create({
+    data,
+  });
+};
+
+// Get ResourceTemplate by ID
+export const getResourceTemplateById = async (id: string) => {
+  return prisma.resourceTemplate.findUnique({
+    where: { id },
+  });
+};
+
+// List ResourceTemplates
+export const listResourceTemplates = async (filter: any = {}) => {
+  return prisma.resourceTemplate.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update ResourceTemplate
+export const updateResourceTemplate = async (id: string, data: ResourceTemplateUpdateInput) => {
+  return prisma.resourceTemplate.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete ResourceTemplate
+export const deleteResourceTemplate = async (id: string) => {
+  return prisma.resourceTemplate.delete({
+    where: { id },
+  });
+};

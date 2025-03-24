@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type AddOnCreateInput = Prisma.AddOnCreateInput;
+type AddOnUpdateInput = Prisma.AddOnUpdateInput;
+
+// Create AddOn
+export const createAddOn = async (data: AddOnCreateInput) => {
+  return prisma.addOn.create({
+    data,
+  });
+};
+
+// Get AddOn by ID
+export const getAddOnById = async (id: string) => {
+  return prisma.addOn.findUnique({
+    where: { id },
+  });
+};
+
+// List AddOns
+export const listAddOns = async (filter: any = {}) => {
+  return prisma.addOn.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update AddOn
+export const updateAddOn = async (id: string, data: AddOnUpdateInput) => {
+  return prisma.addOn.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete AddOn
+export const deleteAddOn = async (id: string) => {
+  return prisma.addOn.delete({
+    where: { id },
+  });
+};

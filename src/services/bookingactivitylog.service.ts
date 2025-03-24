@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type BookingActivityLogCreateInput = Prisma.BookingActivityLogCreateInput;
+type BookingActivityLogUpdateInput = Prisma.BookingActivityLogUpdateInput;
+
+// Create BookingActivityLog
+export const createBookingActivityLog = async (data: BookingActivityLogCreateInput) => {
+  return prisma.bookingActivityLog.create({
+    data,
+  });
+};
+
+// Get BookingActivityLog by ID
+export const getBookingActivityLogById = async (id: string) => {
+  return prisma.bookingActivityLog.findUnique({
+    where: { id },
+  });
+};
+
+// List BookingActivityLogs
+export const listBookingActivityLogs = async (filter: any = {}) => {
+  return prisma.bookingActivityLog.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update BookingActivityLog
+export const updateBookingActivityLog = async (id: string, data: BookingActivityLogUpdateInput) => {
+  return prisma.bookingActivityLog.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete BookingActivityLog
+export const deleteBookingActivityLog = async (id: string) => {
+  return prisma.bookingActivityLog.delete({
+    where: { id },
+  });
+};

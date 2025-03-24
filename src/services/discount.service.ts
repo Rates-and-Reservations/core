@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type DiscountCreateInput = Prisma.DiscountCreateInput;
+type DiscountUpdateInput = Prisma.DiscountUpdateInput;
+
+// Create Discount
+export const createDiscount = async (data: DiscountCreateInput) => {
+  return prisma.discount.create({
+    data,
+  });
+};
+
+// Get Discount by ID
+export const getDiscountById = async (id: string) => {
+  return prisma.discount.findUnique({
+    where: { id },
+  });
+};
+
+// List Discounts
+export const listDiscounts = async (filter: any = {}) => {
+  return prisma.discount.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update Discount
+export const updateDiscount = async (id: string, data: DiscountUpdateInput) => {
+  return prisma.discount.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete Discount
+export const deleteDiscount = async (id: string) => {
+  return prisma.discount.delete({
+    where: { id },
+  });
+};

@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type AppInstallScopeCreateInput = Prisma.AppInstallScopeCreateInput;
+type AppInstallScopeUpdateInput = Prisma.AppInstallScopeUpdateInput;
+
+// Create AppInstallScope
+export const createAppInstallScope = async (data: AppInstallScopeCreateInput) => {
+  return prisma.appInstallScope.create({
+    data,
+  });
+};
+
+// Get AppInstallScope by ID
+export const getAppInstallScopeById = async (id: string) => {
+  return prisma.appInstallScope.findUnique({
+    where: { id },
+  });
+};
+
+// List AppInstallScopes
+export const listAppInstallScopes = async (filter: any = {}) => {
+  return prisma.appInstallScope.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update AppInstallScope
+export const updateAppInstallScope = async (id: string, data: AppInstallScopeUpdateInput) => {
+  return prisma.appInstallScope.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete AppInstallScope
+export const deleteAppInstallScope = async (id: string) => {
+  return prisma.appInstallScope.delete({
+    where: { id },
+  });
+};

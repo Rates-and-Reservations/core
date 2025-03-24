@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type WebhookEndpointCreateInput = Prisma.WebhookEndpointCreateInput;
+type WebhookEndpointUpdateInput = Prisma.WebhookEndpointUpdateInput;
+
+// Create WebhookEndpoint
+export const createWebhookEndpoint = async (data: WebhookEndpointCreateInput) => {
+  return prisma.webhookEndpoint.create({
+    data,
+  });
+};
+
+// Get WebhookEndpoint by ID
+export const getWebhookEndpointById = async (id: string) => {
+  return prisma.webhookEndpoint.findUnique({
+    where: { id },
+  });
+};
+
+// List WebhookEndpoints
+export const listWebhookEndpoints = async (filter: any = {}) => {
+  return prisma.webhookEndpoint.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update WebhookEndpoint
+export const updateWebhookEndpoint = async (id: string, data: WebhookEndpointUpdateInput) => {
+  return prisma.webhookEndpoint.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete WebhookEndpoint
+export const deleteWebhookEndpoint = async (id: string) => {
+  return prisma.webhookEndpoint.delete({
+    where: { id },
+  });
+};

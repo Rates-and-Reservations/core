@@ -157,45 +157,44 @@ model ApiKey {
 }
 
 model ApiUsageLog {
-  id               String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  merchantId       String
-  merchant         Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  apiKeyId         String
-  apiKey           ApiKey @relation(fields: [apiKeyId], references: [id])
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
 
-  endpoint         String    // e.g., "/v1/bookings"
-  method           String    // GET, POST, etc.
-  statusCode       Int       // 200, 404, 500, etc.
+  endpoint   String // e.g., "/v1/bookings"
+  method     String // GET, POST, etc.
+  statusCode Int // 200, 404, 500, etc.
 
-  ipAddress        String?
-  userAgent        String?
+  ipAddress String?
+  userAgent String?
 
-  responseTimeMs   Int       // Response time in milliseconds
-  rateLimitExceeded Boolean  @default(false)
+  responseTimeMs    Int // Response time in milliseconds
+  rateLimitExceeded Boolean @default(false)
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model ApiUsageStat {
-  id               String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  merchantId       String
-  merchant         Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  apiKeyId         String
-  apiKey           ApiKey @relation(fields: [apiKeyId], references: [id])
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
 
-  date             DateTime // e.g., "2025-03-24"
-  requestCount     Int      // Total requests on this date
-  successCount     Int      // 2xx responses
-  errorCount       Int      // 4xx, 5xx responses
-  rateLimitHits    Int
+  date          DateTime // e.g., "2025-03-24"
+  requestCount  Int // Total requests on this date
+  successCount  Int // 2xx responses
+  errorCount    Int // 4xx, 5xx responses
+  rateLimitHits Int
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 }
-
 
 model ResourceTemplate {
   id         String    @id @default(cuid())
@@ -429,6 +428,9 @@ model BookingAddOn {
   addOnId    String
   quantity   Int     @default(1)
   totalPrice Decimal
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Customer {
@@ -919,29 +921,29 @@ enum RefundStatus {
 }
 
 model App {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name           String
-  description    String?
-  logoUrl        String?
-  websiteUrl     String?
+  name        String
+  description String?
+  logoUrl     String?
+  websiteUrl  String?
 
   merchantId String
   merchant   Merchant @relation(fields: [merchantId], references: [id])
-  
-  clientId       String?   // For OAuth apps
-  clientSecret   String?   // For OAuth apps (store securely!)
 
-  redirectUrls   Json?     // OAuth redirects (if using OAuth)
-  webhookUrl     String?   // Optional webhook to notify the app
+  clientId     String? // For OAuth apps
+  clientSecret String? // For OAuth apps (store securely!)
 
-  scopes         Json?     // ["bookings:read", "payments:write"]
+  redirectUrls Json? // OAuth redirects (if using OAuth)
+  webhookUrl   String? // Optional webhook to notify the app
 
-  isPublic       Boolean @default(false)
-  isActive       Boolean @default(true)
+  scopes Json? // ["bookings:read", "payments:write"]
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isPublic Boolean @default(false)
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   AppInstall AppInstall[]
 
@@ -949,21 +951,21 @@ model App {
 }
 
 model AppInstall {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  merchantId     String
-  merchant       Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  appId          String
-  app            App @relation(fields: [appId], references: [id])
+  appId String
+  app   App    @relation(fields: [appId], references: [id])
 
-  status         AppInstallStatus @default(PENDING)
+  status AppInstallStatus @default(PENDING)
 
-  installedAt    DateTime?
-  uninstalledAt  DateTime?
+  installedAt   DateTime?
+  uninstalledAt DateTime?
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   AppInstallScope AppInstallScope[]
 }
@@ -976,43 +978,43 @@ enum AppInstallStatus {
 }
 
 model AppScope {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  name        String   // e.g., "bookings:read"
+  name        String // e.g., "bookings:read"
   description String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   AppInstallScope AppInstallScope[]
 }
 
 model AppInstallScope {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  appInstallId   String
-  appInstall     AppInstall @relation(fields: [appInstallId], references: [id])
+  appInstallId String
+  appInstall   AppInstall @relation(fields: [appInstallId], references: [id])
 
-  scopeId        String
-  scope          AppScope @relation(fields: [scopeId], references: [id])
+  scopeId String
+  scope   AppScope @relation(fields: [scopeId], references: [id])
 
-  grantedAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model OAuthToken {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  appId          String
-  app            App @relation(fields: [appId], references: [id])
+  appId String
+  app   App    @relation(fields: [appId], references: [id])
 
-  merchantId     String
-  merchant       Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  accessToken    String
-  refreshToken   String?
-  expiresAt      DateTime?
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
 
-  scopes         Json?  // Optional: list of granted scopes
+  scopes Json? // Optional: list of granted scopes
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

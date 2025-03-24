@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type RateCreateInput = Prisma.RateCreateInput;
+type RateUpdateInput = Prisma.RateUpdateInput;
+
+// Create Rate
+export const createRate = async (data: RateCreateInput) => {
+  return prisma.rate.create({
+    data,
+  });
+};
+
+// Get Rate by ID
+export const getRateById = async (id: string) => {
+  return prisma.rate.findUnique({
+    where: { id },
+  });
+};
+
+// List Rates
+export const listRates = async (filter: any = {}) => {
+  return prisma.rate.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update Rate
+export const updateRate = async (id: string, data: RateUpdateInput) => {
+  return prisma.rate.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete Rate
+export const deleteRate = async (id: string) => {
+  return prisma.rate.delete({
+    where: { id },
+  });
+};

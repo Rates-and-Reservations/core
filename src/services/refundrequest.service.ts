@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type RefundRequestCreateInput = Prisma.RefundRequestCreateInput;
+type RefundRequestUpdateInput = Prisma.RefundRequestUpdateInput;
+
+// Create RefundRequest
+export const createRefundRequest = async (data: RefundRequestCreateInput) => {
+  return prisma.refundRequest.create({
+    data,
+  });
+};
+
+// Get RefundRequest by ID
+export const getRefundRequestById = async (id: string) => {
+  return prisma.refundRequest.findUnique({
+    where: { id },
+  });
+};
+
+// List RefundRequests
+export const listRefundRequests = async (filter: any = {}) => {
+  return prisma.refundRequest.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update RefundRequest
+export const updateRefundRequest = async (id: string, data: RefundRequestUpdateInput) => {
+  return prisma.refundRequest.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete RefundRequest
+export const deleteRefundRequest = async (id: string) => {
+  return prisma.refundRequest.delete({
+    where: { id },
+  });
+};

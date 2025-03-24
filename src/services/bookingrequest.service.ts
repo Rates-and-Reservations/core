@@ -1,0 +1,43 @@
+import prisma from '@/clients/prisma';
+import { Prisma } from '@prisma/client';
+
+// Type Aliases
+type BookingRequestCreateInput = Prisma.BookingRequestCreateInput;
+type BookingRequestUpdateInput = Prisma.BookingRequestUpdateInput;
+
+// Create BookingRequest
+export const createBookingRequest = async (data: BookingRequestCreateInput) => {
+  return prisma.bookingRequest.create({
+    data,
+  });
+};
+
+// Get BookingRequest by ID
+export const getBookingRequestById = async (id: string) => {
+  return prisma.bookingRequest.findUnique({
+    where: { id },
+  });
+};
+
+// List BookingRequests
+export const listBookingRequests = async (filter: any = {}) => {
+  return prisma.bookingRequest.findMany({
+    where: filter,
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+// Update BookingRequest
+export const updateBookingRequest = async (id: string, data: BookingRequestUpdateInput) => {
+  return prisma.bookingRequest.update({
+    where: { id },
+    data,
+  });
+};
+
+// Delete BookingRequest
+export const deleteBookingRequest = async (id: string) => {
+  return prisma.bookingRequest.delete({
+    where: { id },
+  });
+};
