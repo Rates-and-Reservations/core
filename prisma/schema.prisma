@@ -75,6 +75,16 @@ model Merchant {
   BookingActivityLog BookingActivityLog[]
 
   RefundRequest RefundRequest[]
+
+  ApiUsageLog ApiUsageLog[]
+
+  ApiUsageStat ApiUsageStat[]
+
+  App App[]
+
+  AppInstall AppInstall[]
+
+  OAuthToken OAuthToken[]
 }
 
 model MerchantContact {
@@ -127,12 +137,65 @@ enum OrganisationRoles {
 
 model ApiKey {
   id         String   @id @default(cuid())
-  keyHash    String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
   merchantId String
-  revoked    Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  keyHash     String  @unique // Hashed + secure storage (NEVER plain text)
+  label       String? // "Dashboard Key", "Public API Key"
+  description String?
+
+  scopes   Json? // e.g., ["bookings:read", "bookings:create"]
+  isActive Boolean @default(true)
+
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  ApiUsageLog ApiUsageLog[]
+
+  ApiUsageStat ApiUsageStat[]
 }
+
+model ApiUsageLog {
+  id               String   @id @default(cuid())
+
+  merchantId       String
+  merchant         Merchant @relation(fields: [merchantId], references: [id])
+
+  apiKeyId         String
+  apiKey           ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  endpoint         String    // e.g., "/v1/bookings"
+  method           String    // GET, POST, etc.
+  statusCode       Int       // 200, 404, 500, etc.
+
+  ipAddress        String?
+  userAgent        String?
+
+  responseTimeMs   Int       // Response time in milliseconds
+  rateLimitExceeded Boolean  @default(false)
+
+  createdAt        DateTime @default(now())
+}
+
+model ApiUsageStat {
+  id               String   @id @default(cuid())
+
+  merchantId       String
+  merchant         Merchant @relation(fields: [merchantId], references: [id])
+
+  apiKeyId         String
+  apiKey           ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  date             DateTime // e.g., "2025-03-24"
+  requestCount     Int      // Total requests on this date
+  successCount     Int      // 2xx responses
+  errorCount       Int      // 4xx, 5xx responses
+  rateLimitHits    Int
+
+  createdAt        DateTime @default(now())
+}
+
 
 model ResourceTemplate {
   id         String    @id @default(cuid())
@@ -556,7 +619,7 @@ model Notification {
 
   sentAt    DateTime?
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 enum NotificationType {
@@ -589,7 +652,7 @@ model NotificationTemplate {
   isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model WebhookEndpoint {
@@ -605,33 +668,33 @@ model WebhookEndpoint {
   isActive Boolean @default(true)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   WebhookEvent WebhookEvent[]
 }
 
 model WebhookEvent {
-  id               String   @id @default(cuid())
-  merchantId       String
-  merchant         Merchant @relation(fields: [merchantId], references: [id])
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  endpointId       String
-  endpoint         WebhookEndpoint @relation(fields: [endpointId], references: [id])
+  endpointId String
+  endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id])
 
-  eventType        WebhookEventType // e.g., BOOKING_CREATED
-  payload          Json
+  eventType WebhookEventType // e.g., BOOKING_CREATED
+  payload   Json
 
-  status           WebhookEventStatus @default(PENDING)
-  responseCode     Int?
-  responseBody     String?
-  errorMessage     String?
+  status       WebhookEventStatus @default(PENDING)
+  responseCode Int?
+  responseBody String?
+  errorMessage String?
 
-  retryCount       Int @default(0)
-  nextRetryAt      DateTime?
+  retryCount  Int       @default(0)
+  nextRetryAt DateTime?
 
-  sentAt           DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   WebhookEventLog WebhookEventLog[]
 }
@@ -649,58 +712,58 @@ enum WebhookEventStatus {
 }
 
 model WebhookEventLog {
-  id             String   @id @default(cuid())
-  eventId        String
-  webhookEvent   WebhookEvent @relation(fields: [eventId], references: [id])
+  id           String       @id @default(cuid())
+  eventId      String
+  webhookEvent WebhookEvent @relation(fields: [eventId], references: [id])
 
-  attemptNumber  Int
-  responseCode   Int
-  responseBody   String?
-  errorMessage   String?
+  attemptNumber Int
+  responseCode  Int
+  responseBody  String?
+  errorMessage  String?
 
-  sentAt         DateTime
-  createdAt      DateTime @default(now())
+  sentAt    DateTime
+  createdAt DateTime @default(now())
 }
 
 model AuditLog {
-  id             String   @id @default(cuid())
-  merchantId     String
-  merchant       Merchant @relation(fields: [merchantId], references: [id])
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  userId         String?   // Clerk userId (optional if system-initiated)
-  action         String    // e.g., "booking.created", "rate.updated"
-  resourceType   String    // e.g., "Booking", "Rate"
-  resourceId     String?   // Optional: link to the specific entity
+  userId       String? // Clerk userId (optional if system-initiated)
+  action       String // e.g., "booking.created", "rate.updated"
+  resourceType String // e.g., "Booking", "Rate"
+  resourceId   String? // Optional: link to the specific entity
 
-  description    String?   // e.g., "John Doe confirmed booking #ABC123"
+  description String? // e.g., "John Doe confirmed booking #ABC123"
 
-  ipAddress      String?   // Optional: for security/audit trail
-  userAgent      String?   // Optional: client browser/device info
+  ipAddress String? // Optional: for security/audit trail
+  userAgent String? // Optional: client browser/device info
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model BookingActivityLog {
-  id             String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  merchantId     String
-  merchant       Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  bookingId      String
-  booking        Booking @relation(fields: [bookingId], references: [id])
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
-  userId         String?   // Optional: Clerk user ID if a merchant user made the change
-  systemAction   Boolean   @default(false)  // True if it was system-triggered (e.g., auto-cancel)
+  userId       String? // Optional: Clerk user ID if a merchant user made the change
+  systemAction Boolean @default(false) // True if it was system-triggered (e.g., auto-cancel)
 
-  action         BookingActionType   // e.g., STATUS_CHANGED, PAYMENT_UPDATED, CUSTOMER_NOTIFIED
-  previousValue  String?             // JSON or string snapshot (optional)
-  newValue       String?             // JSON or string snapshot (optional)
+  action        BookingActionType // e.g., STATUS_CHANGED, PAYMENT_UPDATED, CUSTOMER_NOTIFIED
+  previousValue String? // JSON or string snapshot (optional)
+  newValue      String? // JSON or string snapshot (optional)
 
-  description    String?             // Optional human-readable description
-  ipAddress      String?
-  userAgent      String?
+  description String? // Optional human-readable description
+  ipAddress   String?
+  userAgent   String?
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 enum BookingActionType {
@@ -713,33 +776,32 @@ enum BookingActionType {
   REFUNDED
 }
 
-
 model WaitlistEntry {
-  id              String   @id @default(cuid())
-  
-  merchantId      String
-  merchant        Merchant @relation(fields: [merchantId], references: [id])
+  id String @id @default(cuid())
 
-  resourceId      String
-  resource        Resource @relation(fields: [resourceId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  customerId      String?
-  customer        Customer? @relation(fields: [customerId], references: [id])
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
   // Optional pre-filled timeslot the customer is waiting for
   desiredStartTime DateTime?
   desiredEndTime   DateTime?
 
-  notes           String?
+  notes String?
 
-  status          WaitlistStatus @default(ACTIVE)  
-  priority        Int @default(0)   // Optional: manual sorting or ranking
+  status   WaitlistStatus @default(ACTIVE)
+  priority Int            @default(0) // Optional: manual sorting or ranking
 
-  notifiedAt      DateTime?
-  promotedAt      DateTime?         // If they were converted into a booking
+  notifiedAt DateTime?
+  promotedAt DateTime? // If they were converted into a booking
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum WaitlistStatus {
@@ -750,34 +812,34 @@ enum WaitlistStatus {
 }
 
 model Invoice {
-  id               String   @id @default(cuid())
-  merchantId       String
-  merchant         Merchant @relation(fields: [merchantId], references: [id])
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  bookingId        String?
-  booking          Booking? @relation(fields: [bookingId], references: [id])
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
 
-  customerId       String?
-  customer         Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
 
-  invoiceNumber    String   @unique   // e.g., INV-2024-0001
-  currency         String
+  invoiceNumber String @unique // e.g., INV-2024-0001
+  currency      String
 
-  subtotal         Decimal
-  taxAmount        Decimal
-  discountAmount   Decimal
-  totalAmount      Decimal
+  subtotal       Decimal
+  taxAmount      Decimal
+  discountAmount Decimal
+  totalAmount    Decimal
 
-  status           InvoiceStatus @default(PENDING)
-  issueDate        DateTime
-  dueDate          DateTime?
-  paidAt           DateTime?
+  status    InvoiceStatus @default(PENDING)
+  issueDate DateTime
+  dueDate   DateTime?
+  paidAt    DateTime?
 
-  notes            String?
-  pdfUrl           String?   // Link to generated PDF (optional)
+  notes  String?
+  pdfUrl String? // Link to generated PDF (optional)
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum InvoiceStatus {
@@ -788,34 +850,34 @@ enum InvoiceStatus {
 }
 
 model RefundRequest {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  merchantId      String
-  merchant        Merchant @relation(fields: [merchantId], references: [id])
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
 
-  bookingId       String
-  booking         Booking @relation(fields: [bookingId], references: [id])
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
   paymentTransactionId String
   paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
 
-  amount          Decimal
-  currency        String
+  amount   Decimal
+  currency String
 
-  reason          String?
-  status          RefundRequestStatus @default(PENDING)
-  
-  approvedBy      String? // Clerk user ID of the approver (optional)
-  approvedAt      DateTime?
-  rejectedAt      DateTime?
+  reason String?
+  status RefundRequestStatus @default(PENDING)
 
-  requestedBy     String? // Clerk user ID of requester (optional)
-  requestedAt     DateTime @default(now())
+  approvedBy String? // Clerk user ID of the approver (optional)
+  approvedAt DateTime?
+  rejectedAt DateTime?
 
-  processedAt     DateTime?
+  requestedBy String? // Clerk user ID of requester (optional)
+  requestedAt DateTime @default(now())
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   RefundLog RefundLog[]
 }
@@ -828,30 +890,129 @@ enum RefundRequestStatus {
 }
 
 model RefundLog {
-  id                    String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  refundRequestId       String
-  refundRequest         RefundRequest @relation(fields: [refundRequestId], references: [id])
+  refundRequestId String
+  refundRequest   RefundRequest @relation(fields: [refundRequestId], references: [id])
 
-  paymentTransactionId  String
-  paymentTransaction    PaymentActions @relation(fields: [paymentTransactionId], references: [id])
+  paymentTransactionId String
+  paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
 
-  amount                Decimal
-  currency              String
+  amount   Decimal
+  currency String
 
-  provider              String   // e.g., "stripe"
-  providerRefundId      String   // ID returned by Stripe or payment processor
+  provider         String // e.g., "stripe"
+  providerRefundId String // ID returned by Stripe or payment processor
 
-  status                RefundStatus @default(PENDING)
-  errorMessage          String?
+  status       RefundStatus @default(PENDING)
+  errorMessage String?
 
-  processedAt           DateTime?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @default(now())
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum RefundStatus {
   PENDING
   SUCCESS
   FAILED
+}
+
+model App {
+  id             String   @id @default(cuid())
+
+  name           String
+  description    String?
+  logoUrl        String?
+  websiteUrl     String?
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  
+  clientId       String?   // For OAuth apps
+  clientSecret   String?   // For OAuth apps (store securely!)
+
+  redirectUrls   Json?     // OAuth redirects (if using OAuth)
+  webhookUrl     String?   // Optional webhook to notify the app
+
+  scopes         Json?     // ["bookings:read", "payments:write"]
+
+  isPublic       Boolean @default(false)
+  isActive       Boolean @default(true)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  AppInstall AppInstall[]
+
+  OAuthToken OAuthToken[]
+}
+
+model AppInstall {
+  id             String   @id @default(cuid())
+
+  merchantId     String
+  merchant       Merchant @relation(fields: [merchantId], references: [id])
+
+  appId          String
+  app            App @relation(fields: [appId], references: [id])
+
+  status         AppInstallStatus @default(PENDING)
+
+  installedAt    DateTime?
+  uninstalledAt  DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  AppInstallScope AppInstallScope[]
+}
+
+enum AppInstallStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  UNINSTALLED
+}
+
+model AppScope {
+  id          String   @id @default(cuid())
+
+  name        String   // e.g., "bookings:read"
+  description String?
+
+  createdAt   DateTime @default(now())
+
+  AppInstallScope AppInstallScope[]
+}
+
+model AppInstallScope {
+  id             String   @id @default(cuid())
+
+  appInstallId   String
+  appInstall     AppInstall @relation(fields: [appInstallId], references: [id])
+
+  scopeId        String
+  scope          AppScope @relation(fields: [scopeId], references: [id])
+
+  grantedAt      DateTime @default(now())
+}
+
+model OAuthToken {
+  id             String   @id @default(cuid())
+
+  appId          String
+  app            App @relation(fields: [appId], references: [id])
+
+  merchantId     String
+  merchant       Merchant @relation(fields: [merchantId], references: [id])
+
+  accessToken    String
+  refreshToken   String?
+  expiresAt      DateTime?
+
+  scopes         Json?  // Optional: list of granted scopes
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
 }
