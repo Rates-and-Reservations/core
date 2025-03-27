@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * Merchant Models
+ */
+
+//  Merchant: The main entity representing a business or organisation
 model Merchant {
   id           String       @id @default(cuid())
   name         String
@@ -87,6 +92,7 @@ model Merchant {
   OAuthToken OAuthToken[]
 }
 
+//  MerchantContact: Contact details for the merchant
 model MerchantContact {
   id         String   @id @default(cuid())
   merchant   Merchant @relation(fields: [merchantId], references: [id])
@@ -100,6 +106,7 @@ model MerchantContact {
   updatedAt  DateTime @updatedAt
 }
 
+//  MerchantUser: Represents a user within the merchant's organisation
 model MerchantUser {
   id         String            @id @default(cuid())
   merchant   Merchant          @relation(fields: [merchantId], references: [id])
@@ -110,6 +117,7 @@ model MerchantUser {
   updatedAt  DateTime          @updatedAt
 }
 
+//  MerchantAsset: Represents a file or asset uploaded by the merchant
 model MerchantAsset {
   id         String   @id @default(cuid())
   merchant   Merchant @relation(fields: [merchantId], references: [id])
@@ -135,67 +143,11 @@ enum OrganisationRoles {
   DEVELOPER
 }
 
-model ApiKey {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+/**
+ * Resource Models
+ */
 
-  keyHash     String  @unique // Hashed + secure storage (NEVER plain text)
-  label       String? // "Dashboard Key", "Public API Key"
-  description String?
-
-  scopes   Json? // e.g., ["bookings:read", "bookings:create"]
-  isActive Boolean @default(true)
-
-  lastUsedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  ApiUsageLog ApiUsageLog[]
-
-  ApiUsageStat ApiUsageStat[]
-}
-
-model ApiUsageLog {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  apiKeyId String
-  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
-
-  endpoint   String // e.g., "/v1/bookings"
-  method     String // GET, POST, etc.
-  statusCode Int // 200, 404, 500, etc.
-
-  ipAddress String?
-  userAgent String?
-
-  responseTimeMs    Int // Response time in milliseconds
-  rateLimitExceeded Boolean @default(false)
-
-  createdAt DateTime @default(now())
-}
-
-model ApiUsageStat {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  apiKeyId String
-  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
-
-  date          DateTime // e.g., "2025-03-24"
-  requestCount  Int // Total requests on this date
-  successCount  Int // 2xx responses
-  errorCount    Int // 4xx, 5xx responses
-  rateLimitHits Int
-
-  createdAt DateTime @default(now())
-}
-
+// ResourceTemplate: Represents a template for a resource type
 model ResourceTemplate {
   id         String    @id @default(cuid())
   merchantId String?
@@ -213,6 +165,7 @@ model ResourceTemplate {
   Resource Resource[]
 }
 
+// Resource: Represents a physical or virtual resource that can be booked
 model Resource {
   id         String   @id @default(cuid())
   merchantId String
@@ -241,6 +194,57 @@ model Resource {
   WaitlistEntry WaitlistEntry[]
 }
 
+// ResourceBookingConfig: Represents the booking configuration for a resource
+model ResourceBookingConfig {
+  id         String   @id @default(cuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  minDuration Int
+  maxDuration Int
+  bufferTime  Int
+
+  availableDays Json? // [{ day: "Monday", open: "09:00", close: "17:00" }]
+  blackoutDates Json? // ["2025-12-25", "2025-12-26"]
+
+  allowMultipleBookings Boolean @default(false)
+  enableWaitlist        Boolean @default(false)
+
+  // ✅ Cancellation policy belongs here
+  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
+  refundWindowHours  Int? // e.g. cancel up to 24 hours before
+
+  isActive Boolean @default(true) // resource booking on/off
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// AddOn: Represents an additional service or item that can be attached to a booking
+model AddOn {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name          String
+  description   String?
+  price         Decimal
+  currency      String
+  showInBooking Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  BookingAddOn BookingAddOn[]
+
+  RateAddOn RateAddOn[]
+}
+
+/**
+ * Pricing Models
+ */
+
+// Rate: Represents a pricing rate for a resource
 model Rate {
   id         String   @id @default(cuid())
   merchantId String
@@ -277,30 +281,8 @@ model Rate {
   BookingRequest BookingRequest[]
 
   Booking Booking[]
-}
 
-model ResourceBookingConfig {
-  id         String   @id @default(cuid())
-  resourceId String
-  resource   Resource @relation(fields: [resourceId], references: [id])
-
-  minDuration Int
-  maxDuration Int
-  bufferTime  Int
-
-  availableDays Json? // [{ day: "Monday", open: "09:00", close: "17:00" }]
-  blackoutDates Json? // ["2025-12-25", "2025-12-26"]
-
-  allowMultipleBookings Boolean @default(false)
-
-  // ✅ Cancellation policy belongs here
-  cancellationPolicy CancellationPolicy @default(FLEXIBLE)
-  refundWindowHours  Int? // e.g. cancel up to 24 hours before
-
-  isActive Boolean @default(true) // resource booking on/off
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  RateAddOn RateAddOn[]
 }
 
 enum RateDurationType {
@@ -321,6 +303,17 @@ enum TaxType {
   FIXED
 }
 
+// RateAddOn: Represents an add-on that can be attached to a rate
+model RateAddOn {
+  id      String @id @default(cuid())
+  rateId  String
+  addOnId String
+
+  rate  Rate  @relation(fields: [rateId], references: [id])
+  addOn AddOn @relation(fields: [addOnId], references: [id])
+}
+
+// Discount: Represents a discount that can be applied to a rate
 model Discount {
   id         String   @id @default(cuid())
   merchantId String
@@ -351,6 +344,57 @@ enum DiscountType {
   FIXED
 }
 
+/**
+ * Booking Configuration Models
+ */
+
+// BookingPageTemplate: Represents a template for a booking page design
+model BookingPageTemplate {
+  id              String  @id @default(cuid())
+  name            String
+  description     String?
+  previewImageUrl String? // Preview of template design
+  isSystem        Boolean @default(false)
+
+  merchantId String? // Null if it's a system template
+  merchant   Merchant? @relation(fields: [merchantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingPage BookingPage[]
+}
+
+// BookingPage: Represents a hosted booking page for a merchant
+model BookingPage {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name String
+  slug String @unique // Used for hosted page: yourplatform.com/m/{slug}
+
+  templateId String
+  template   BookingPageTemplate @relation(fields: [templateId], references: [id])
+
+  primaryColor   String // Branding
+  secondaryColor String
+  logoUrl        String?
+
+  customDomain String? // Optional: custom CNAME domain
+  isActive     Boolean @default(true)
+
+  config Json? // JSON blob for custom options: { showRatings: true, requireLogin: false }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/**
+ * Booking Models
+ */
+
+// Booking: Represents a booking made by a customer
 model Booking {
   id         String   @id @default(cuid())
   merchantId String
@@ -392,6 +436,8 @@ model Booking {
   notes         String?
   internalNotes String?
 
+  metadata Json?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -407,25 +453,16 @@ model Booking {
   RefundRequest RefundRequest[]
 }
 
-model AddOn {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name        String
-  description String?
-  price       Decimal
-  currency    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
+// BookingAddOn: Represents an add-on attached to a booking
 model BookingAddOn {
-  id        String  @id @default(cuid())
+  id String @id @default(cuid())
+
   bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id])
 
-  addOnId    String
+  addOnId String
+  addOn   AddOn  @relation(fields: [addOnId], references: [id])
+
   quantity   Int     @default(1)
   totalPrice Decimal
 
@@ -433,6 +470,7 @@ model BookingAddOn {
   updatedAt DateTime @updatedAt
 }
 
+// Customer: Represents a customer who makes bookings
 model Customer {
   id         String   @id @default(cuid())
   merchantId String
@@ -459,46 +497,6 @@ model Customer {
   WaitlistEntry WaitlistEntry[]
 
   Invoice Invoice[]
-}
-
-model BookingPageTemplate {
-  id              String  @id @default(cuid())
-  name            String
-  description     String?
-  previewImageUrl String? // Preview of template design
-  isSystem        Boolean @default(false)
-
-  merchantId String? // Null if it's a system template
-  merchant   Merchant? @relation(fields: [merchantId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  BookingPage BookingPage[]
-}
-
-model BookingPage {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name String
-  slug String @unique // Used for hosted page: yourplatform.com/m/{slug}
-
-  templateId String
-  template   BookingPageTemplate @relation(fields: [templateId], references: [id])
-
-  primaryColor   String // Branding
-  secondaryColor String
-  logoUrl        String?
-
-  customDomain String? // Optional: custom CNAME domain
-  isActive     Boolean @default(true)
-
-  config Json? // JSON blob for custom options: { showRatings: true, requireLogin: false }
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum BookingStatus {
@@ -657,127 +655,6 @@ model NotificationTemplate {
   updatedAt DateTime @updatedAt
 }
 
-model WebhookEndpoint {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name   String
-  url    String
-  secret String // Used to sign payloads
-  events Json // ["booking.created", "payment.successful"]
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  WebhookEvent WebhookEvent[]
-}
-
-model WebhookEvent {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  endpointId String
-  endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id])
-
-  eventType WebhookEventType // e.g., BOOKING_CREATED
-  payload   Json
-
-  status       WebhookEventStatus @default(PENDING)
-  responseCode Int?
-  responseBody String?
-  errorMessage String?
-
-  retryCount  Int       @default(0)
-  nextRetryAt DateTime?
-
-  sentAt    DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  WebhookEventLog WebhookEventLog[]
-}
-
-enum WebhookEventType {
-  BOOKING_CREATED
-  BOOKING_UPDATED
-  PAYMENT_SUCCESSFUL
-}
-
-enum WebhookEventStatus {
-  PENDING
-  SENT
-  FAILED
-}
-
-model WebhookEventLog {
-  id           String       @id @default(cuid())
-  eventId      String
-  webhookEvent WebhookEvent @relation(fields: [eventId], references: [id])
-
-  attemptNumber Int
-  responseCode  Int
-  responseBody  String?
-  errorMessage  String?
-
-  sentAt    DateTime
-  createdAt DateTime @default(now())
-}
-
-model AuditLog {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  userId       String? // Clerk userId (optional if system-initiated)
-  action       String // e.g., "booking.created", "rate.updated"
-  resourceType String // e.g., "Booking", "Rate"
-  resourceId   String? // Optional: link to the specific entity
-
-  description String? // e.g., "John Doe confirmed booking #ABC123"
-
-  ipAddress String? // Optional: for security/audit trail
-  userAgent String? // Optional: client browser/device info
-
-  createdAt DateTime @default(now())
-}
-
-model BookingActivityLog {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  userId       String? // Optional: Clerk user ID if a merchant user made the change
-  systemAction Boolean @default(false) // True if it was system-triggered (e.g., auto-cancel)
-
-  action        BookingActionType // e.g., STATUS_CHANGED, PAYMENT_UPDATED, CUSTOMER_NOTIFIED
-  previousValue String? // JSON or string snapshot (optional)
-  newValue      String? // JSON or string snapshot (optional)
-
-  description String? // Optional human-readable description
-  ipAddress   String?
-  userAgent   String?
-
-  createdAt DateTime @default(now())
-}
-
-enum BookingActionType {
-  CREATED
-  UPDATED
-  CANCELLED
-  STATUS_CHANGED
-  PAYMENT_UPDATED
-  CUSTOMER_NOTIFIED
-  REFUNDED
-}
-
 model WaitlistEntry {
   id String @id @default(cuid())
 
@@ -920,6 +797,11 @@ enum RefundStatus {
   FAILED
 }
 
+/**
+ * App marketplace models
+ */
+
+// App: Represents a third-party app or integration
 model App {
   id String @id @default(cuid())
 
@@ -950,6 +832,7 @@ model App {
   OAuthToken OAuthToken[]
 }
 
+// AppInstall: Represents an installed instance of an app
 model AppInstall {
   id String @id @default(cuid())
 
@@ -977,6 +860,7 @@ enum AppInstallStatus {
   UNINSTALLED
 }
 
+// AppScope: Represents a permission scope for an app
 model AppScope {
   id String @id @default(cuid())
 
@@ -988,6 +872,7 @@ model AppScope {
   AppInstallScope AppInstallScope[]
 }
 
+// AppInstallScope: Represents a granted scope for an app install
 model AppInstallScope {
   id String @id @default(cuid())
 
@@ -1000,6 +885,7 @@ model AppInstallScope {
   createdAt DateTime @default(now())
 }
 
+// OAuthToken: Represents an OAuth token for an app install
 model OAuthToken {
   id String @id @default(cuid())
 
@@ -1017,4 +903,202 @@ model OAuthToken {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+}
+
+/**
+ * Events, Usage and analytics models
+ */
+
+// ApiUsageLog: Represents a log entry for API usage
+model ApiUsageLog {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  endpoint   String // e.g., "/v1/bookings"
+  method     String // GET, POST, etc.
+  statusCode Int // 200, 404, 500, etc.
+
+  ipAddress String?
+  userAgent String?
+
+  responseTimeMs    Int // Response time in milliseconds
+  rateLimitExceeded Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+// ApiUsageStat: Represents a daily usage summary for an API key
+model ApiUsageStat {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  date          DateTime // e.g., "2025-03-24"
+  requestCount  Int // Total requests on this date
+  successCount  Int // 2xx responses
+  errorCount    Int // 4xx, 5xx responses
+  rateLimitHits Int
+
+  createdAt DateTime @default(now())
+}
+
+// BookingActivityLog: Represents a log entry for booking activity
+model BookingActivityLog {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  userId       String? // Optional: Clerk user ID if a merchant user made the change
+  systemAction Boolean @default(false) // True if it was system-triggered (e.g., auto-cancel)
+
+  action        BookingActionType // e.g., STATUS_CHANGED, PAYMENT_UPDATED, CUSTOMER_NOTIFIED
+  previousValue String? // JSON or string snapshot (optional)
+  newValue      String? // JSON or string snapshot (optional)
+
+  description String? // Optional human-readable description
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt DateTime @default(now())
+}
+
+enum BookingActionType {
+  CREATED
+  UPDATED
+  CANCELLED
+  STATUS_CHANGED
+  PAYMENT_UPDATED
+  CUSTOMER_NOTIFIED
+  REFUNDED
+}
+
+// AuditLog: Represents a log entry for merchant activity
+model AuditLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  userId       String? // Clerk userId (optional if system-initiated)
+  action       String // e.g., "booking.created", "rate.updated"
+  resourceType String // e.g., "Booking", "Rate"
+  resourceId   String? // Optional: link to the specific entity
+
+  description String? // e.g., "John Doe confirmed booking #ABC123"
+
+  ipAddress String? // Optional: for security/audit trail
+  userAgent String? // Optional: client browser/device info
+
+  createdAt DateTime @default(now())
+}
+
+/**
+ * Developers: Webhooks and event models
+ */
+
+// ApiKey: Represents an API key for merchant API access
+model ApiKey {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  keyHash     String  @unique // Hashed + secure storage (NEVER plain text)
+  label       String? // "Dashboard Key", "Public API Key"
+  description String?
+
+  scopes   Json? // e.g., ["bookings:read", "bookings:create"]
+  isActive Boolean @default(true)
+
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  ApiUsageLog ApiUsageLog[]
+
+  ApiUsageStat ApiUsageStat[]
+}
+
+// WebhookEndpoint: Represents a webhook URL for event notifications
+model WebhookEndpoint {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name   String
+  url    String
+  secret String // Used to sign payloads
+  events Json // ["booking.created", "payment.successful"]
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  WebhookEvent WebhookEvent[]
+}
+
+// WebhookEvent: Represents an event to be sent to a webhook endpoint
+model WebhookEvent {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  endpointId String
+  endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id])
+
+  eventType WebhookEventType // e.g., BOOKING_CREATED
+  payload   Json
+
+  status       WebhookEventStatus @default(PENDING)
+  responseCode Int?
+  responseBody String?
+  errorMessage String?
+
+  retryCount  Int       @default(0)
+  nextRetryAt DateTime?
+
+  sentAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  WebhookEventLog WebhookEventLog[]
+}
+
+enum WebhookEventType {
+  BOOKING_CREATED
+  BOOKING_UPDATED
+  PAYMENT_SUCCESSFUL
+}
+
+enum WebhookEventStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// The actual log of webhook events sent
+model WebhookEventLog {
+  id           String       @id @default(cuid())
+  eventId      String
+  webhookEvent WebhookEvent @relation(fields: [eventId], references: [id])
+
+  attemptNumber Int
+  responseCode  Int
+  responseBody  String?
+  errorMessage  String?
+
+  sentAt    DateTime
+  createdAt DateTime @default(now())
 }
