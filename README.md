@@ -12,12 +12,13 @@ Core API
 * Get merchant by Id
 * Create merchant
 * Update merchant
-* Delete merchant
+* Disable merchant
 
 #### Merchant User
 
 * Invite users
 * Modify merchant user role
+* Remove user from organisations
 
 #### Merchant Contact
 
@@ -35,7 +36,7 @@ Core API
 * Delete merchant asset
 * Modify asset metadata
 
-### Resource Configuration
+### Resource
 
 #### Resource templates
 
@@ -44,16 +45,27 @@ Core API
 * Create resource template
 * Modify resource template
 * Delete resource template
+* Clone template
 
 #### Resources
 
 * List resources
 * Get resource by id
 * Create resource from template
-* Configure resource rate
 * Modify resource
 * Delete resource
-* Configure resource
+* Check availability
+* Get resource rates
+* Add image to resource
+* Delete image
+
+#### Resource Configuration
+
+* List resources configuration
+* Get resource configuration by id
+* Create resource configuration
+* Modify resource configuration
+* Delete resource configuration
 
 #### Add On
 
@@ -72,22 +84,20 @@ Core API
 * Create rate
 * Modify rate
 * Delete rate
+* Add addon to rate
+* Remove addon from rate
+* Clone rate
+* Publish rate
+* Order rate
 
 #### Discount
 
 * List discounts
 * Get discount by id
+* Lookup discount code
 * Create discount
 * Modify discount
 * Delete discount
-
-### Booking Configuration
-
-### Booking
-
-### Payments
-
-### Booking Notifications
 
 ### Developers
 
@@ -104,8 +114,9 @@ Core API
 * List webhook endpoints
 * Get webhook endpoint by id
 * Create webhook endpoint
-* Update webhook endpont
+* Update webhook endpoint
 * Disable webhook endpoint
+* Send test webhook
 
 #### Webhook events
 
@@ -157,6 +168,7 @@ Core API
 * Disconnect merchant
 * Get authorisation URL
 * Get merchant access token
+* Publish app
 
 #### Marketplace Apps
 
@@ -164,3 +176,138 @@ Core API
 * Get app by id
 * Install app
 * Uninstall app
+
+### Booking Configuration
+
+#### Booking Template
+
+* List booking templates
+* Get booking template by id
+* Create booking template
+* Update booking template
+* Delete booking template
+* Clone booking template
+* order booking actions
+
+#### Booking Actions
+
+* Get booking template actions
+* Modify booking action
+* Update booking action
+* Remove booking action
+
+#### UI Template
+
+* List UI templates
+* Get UI template by id
+* Create UI template
+* Update UI template
+* Delete UI template
+
+### Booking Setup
+
+#### Booking Request
+
+* List booking requests
+* Create booking request
+* Get booking request by id
+* Update booking request
+* Complete booking request
+* Cancel booking request
+* Update booking request actions
+
+#### Booking Request Flow
+
+* Create booking request flow
+* Get booking request flow by id
+* Update bookig request flow
+
+### Booking
+
+#### Bookings
+
+* List bookings
+* Get booking details
+* Get booking summary
+* Create bookings
+* Update booking
+* Update booking status
+
+#### Booking Items
+
+* List booking items
+* Get booking item details
+* Update booking item
+* Update booking item status
+
+#### Booking Addons
+
+* Get booking addons
+* Get booking item addons
+
+#### Customers
+
+* List customers
+* Get customer by booking id
+* Get customer by id
+* Get customer resources (notifications, bookings, invoices ...)
+
+#### Cancellations
+
+
+
+#### Waitlist
+
+* List waitlist entries
+* Get waitlist entry
+* Create waitlist entry
+* Update waitlist entry
+* Update waitlist priority
+* Convert waitlist entry to booking
+
+### Payments
+
+#### Payment Action (Payment)
+
+* Get booking payments
+* Get payment by id
+* Create new payment
+* Update payment status
+
+#### Invoice
+
+* List all invoices
+* Get booking invoice(s)
+* Get invoice payments
+* Create invoice payment
+* Get invoice by id
+* Update invoice status
+* Update invoice
+* Download invoice
+
+#### Refunds
+
+* Create refund request
+* Update refund status
+* List refund requests
+* Get refund request details
+* Issue refund
+* View refund logs
+
+### Booking Notifications
+
+#### Notification
+
+* List notifications
+* Get notification by id
+* Create notification
+* Trigger notification
+* Update notification
+
+#### Notification Templates
+
+* List notification templates
+* Create notification template
+* Get notification template
+* Update notification template
+* Delete notification template
