@@ -1,0 +1,23 @@
+import type { Prisma } from '@prisma/client';
+
+import { z } from 'zod';
+import { SortOrderSchema } from './SortOrderSchema';
+import { BookingItemCountOrderByAggregateInputSchema } from './BookingItemCountOrderByAggregateInputSchema';
+import { BookingItemMaxOrderByAggregateInputSchema } from './BookingItemMaxOrderByAggregateInputSchema';
+import { BookingItemMinOrderByAggregateInputSchema } from './BookingItemMinOrderByAggregateInputSchema';
+
+export const BookingItemOrderByWithAggregationInputSchema: z.ZodType<Prisma.BookingItemOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  bookingId: z.lazy(() => SortOrderSchema).optional(),
+  startTime: z.lazy(() => SortOrderSchema).optional(),
+  endTime: z.lazy(() => SortOrderSchema).optional(),
+  bookingRateSnapshotId: z.lazy(() => SortOrderSchema).optional(),
+  status: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => BookingItemCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => BookingItemMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => BookingItemMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export default BookingItemOrderByWithAggregationInputSchema;

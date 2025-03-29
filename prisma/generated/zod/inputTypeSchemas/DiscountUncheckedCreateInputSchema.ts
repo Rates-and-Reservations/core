@@ -1,0 +1,26 @@
+import { Prisma } from '@prisma/client';
+
+import { z } from 'zod';
+import { DiscountTypeSchema } from './DiscountTypeSchema';
+import { isValidDecimalInput } from './isValidDecimalInput';
+import { DecimalJsLikeSchema } from './DecimalJsLikeSchema';
+import { RateUncheckedCreateNestedManyWithoutDiscountInputSchema } from './RateUncheckedCreateNestedManyWithoutDiscountInputSchema';
+
+export const DiscountUncheckedCreateInputSchema: z.ZodType<Prisma.DiscountUncheckedCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  merchantId: z.string(),
+  code: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  discountType: z.lazy(() => DiscountTypeSchema),
+  amount: z.union([z.number(),z.string(),z.instanceof(Prisma.Decimal),DecimalJsLikeSchema,]).refine((v) => isValidDecimalInput(v), { message: 'Must be a Decimal' }),
+  usageLimit: z.number().int().optional().nullable(),
+  usedCount: z.number().int().optional(),
+  startDate: z.coerce.date().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
+  isActive: z.boolean().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  appliesToRates: z.lazy(() => RateUncheckedCreateNestedManyWithoutDiscountInputSchema).optional()
+}).strict();
+
+export default DiscountUncheckedCreateInputSchema;
