@@ -5,6 +5,8 @@ import { StringWithAggregatesFilterSchema } from './StringWithAggregatesFilterSc
 import { EnumBusinessTypeWithAggregatesFilterSchema } from './EnumBusinessTypeWithAggregatesFilterSchema';
 import { BusinessTypeSchema } from './BusinessTypeSchema';
 import { StringNullableWithAggregatesFilterSchema } from './StringNullableWithAggregatesFilterSchema';
+import { BoolWithAggregatesFilterSchema } from './BoolWithAggregatesFilterSchema';
+import { DateTimeNullableWithAggregatesFilterSchema } from './DateTimeNullableWithAggregatesFilterSchema';
 import { DateTimeWithAggregatesFilterSchema } from './DateTimeWithAggregatesFilterSchema';
 
 export const MerchantScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.MerchantScalarWhereWithAggregatesInput> = z.object({
@@ -22,6 +24,10 @@ export const MerchantScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Merc
   logo: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   industry: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   category: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  isVerified: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  isActive: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  verifiedAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  disabledAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();

@@ -1,7 +1,11 @@
+import MerchantSchema from "prisma/generated/zod/modelSchema/MerchantSchema";
 import { z } from "zod";
 
-export const CreateMerchantSchema = z.object({
-  name: z.string().min(1),
+export const CreateMerchantSchema = MerchantSchema.omit({
+  id: true,
+  ownerId: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const UpdateMerchantSchema = z.object({

@@ -15,6 +15,10 @@ export const MerchantCountOrderByAggregateInputSchema: z.ZodType<Prisma.Merchant
   logo: z.lazy(() => SortOrderSchema).optional(),
   industry: z.lazy(() => SortOrderSchema).optional(),
   category: z.lazy(() => SortOrderSchema).optional(),
+  isVerified: z.lazy(() => SortOrderSchema).optional(),
+  isActive: z.lazy(() => SortOrderSchema).optional(),
+  verifiedAt: z.lazy(() => SortOrderSchema).optional(),
+  disabledAt: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();

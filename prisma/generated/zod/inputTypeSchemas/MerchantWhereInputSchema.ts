@@ -5,6 +5,8 @@ import { StringFilterSchema } from './StringFilterSchema';
 import { EnumBusinessTypeFilterSchema } from './EnumBusinessTypeFilterSchema';
 import { BusinessTypeSchema } from './BusinessTypeSchema';
 import { StringNullableFilterSchema } from './StringNullableFilterSchema';
+import { BoolFilterSchema } from './BoolFilterSchema';
+import { DateTimeNullableFilterSchema } from './DateTimeNullableFilterSchema';
 import { DateTimeFilterSchema } from './DateTimeFilterSchema';
 import { MerchantContactListRelationFilterSchema } from './MerchantContactListRelationFilterSchema';
 import { MerchantUserListRelationFilterSchema } from './MerchantUserListRelationFilterSchema';
@@ -52,6 +54,10 @@ export const MerchantWhereInputSchema: z.ZodType<Prisma.MerchantWhereInput> = z.
   logo: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   industry: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   category: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  isVerified: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  verifiedAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  disabledAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   MerchantContact: z.lazy(() => MerchantContactListRelationFilterSchema).optional(),

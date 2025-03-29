@@ -15,6 +15,10 @@ export const MerchantCreateManyInputSchema: z.ZodType<Prisma.MerchantCreateManyI
   logo: z.string().optional().nullable(),
   industry: z.string(),
   category: z.string(),
+  isVerified: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  verifiedAt: z.coerce.date().optional().nullable(),
+  disabledAt: z.coerce.date().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();

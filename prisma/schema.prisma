@@ -36,8 +36,15 @@ model Merchant {
   logo         String?
   industry     String
   category     String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+
+  isVerified Boolean @default(false)
+  isActive   Boolean @default(true)
+
+  verifiedAt DateTime?
+  disabledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   MerchantContact MerchantContact[]
 

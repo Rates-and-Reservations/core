@@ -17,6 +17,10 @@ export const MerchantSchema = z.object({
   logo: z.string().nullable(),
   industry: z.string(),
   category: z.string(),
+  isVerified: z.boolean(),
+  isActive: z.boolean(),
+  verifiedAt: z.coerce.date().nullable(),
+  disabledAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
