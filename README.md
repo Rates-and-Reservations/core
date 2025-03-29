@@ -252,10 +252,6 @@ Core API
 * Get customer by id
 * Get customer resources (notifications, bookings, invoices ...)
 
-#### Cancellations
-
-
-
 #### Waitlist
 
 * List waitlist entries
@@ -264,6 +260,24 @@ Core API
 * Update waitlist entry
 * Update waitlist priority
 * Convert waitlist entry to booking
+
+### Cancellations
+
+#### Cancellation Policy
+
+* List cancellation policies
+* Get cancellation policy by id
+* Create cancellation policy
+* Update cancellation policy
+* Delete cancellation policy
+
+#### Cancellation Request
+
+* List cancellation request
+* Get cancellation request by id
+* Create cancellation request
+* Update cancellation request
+* Update cancellation request status
 
 ### Payments
 

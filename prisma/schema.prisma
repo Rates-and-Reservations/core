@@ -536,7 +536,7 @@ model BookingItem {
 
   BookingItemAddOn BookingItemAddOn[]
 
-  CancellationItem CancellationItem[]
+  CancellationRequest CancellationRequest[]
 }
 
 enum BookingItemStatus {
@@ -944,6 +944,9 @@ model CancellationRequest {
   bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id])
 
+  bookingItemId String?
+  bookingItem   BookingItem? @relation(fields: [bookingItemId], references: [id])
+
   requestedBy String? // Clerk user or customer ID
   reason      String?
   source      CancellationSource @default(CUSTOMER) // CUSTOMER | SYSTEM | SUPPORT
@@ -959,32 +962,6 @@ model CancellationRequest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  cancellationItems CancellationItem[]
-}
-
-// CancellationItem: Represents an item in a booking that was cancelled
-model CancellationItem {
-  id String @id @default(cuid())
-
-  cancellationRequestId String
-  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id])
-
-  bookingItemId String
-  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
-
-  status       CancellationItemStatus @default(PENDING) // PENDING, CANCELLED, NOT_CANCELLED
-  refundAmount Decimal?
-  notes        String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum CancellationItemStatus {
-  PENDING
-  CANCELLED
-  NOT_CANCELLED
 }
 
 enum CancellationStatus {
