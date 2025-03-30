@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
 import * as merchantService from "@/services/merchant.service";
+import { NotFoundError } from "@/errors";
 
 export async function createMerchant(req: Request, res: Response) {
-  try {
-    const merchant = await merchantService.createMerchant(req.body);
-    res.status(201).json(merchant);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const merchant = await merchantService.createMerchant(req.body);
+  res.status(201).json(merchant);
 }
 
 export async function getMerchants(req: Request, res: Response) {
@@ -18,8 +15,7 @@ export async function getMerchants(req: Request, res: Response) {
 export async function getMerchant(req: Request, res: Response) {
   const merchant = await merchantService.getMerchantById(req.params.id);
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(200).json(merchant);
 }
@@ -27,8 +23,7 @@ export async function getMerchant(req: Request, res: Response) {
 export async function updateMerchant(req: Request, res: Response) {
   const merchant = await merchantService.updateMerchant(req.params.id, req.body);
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(200).json(merchant);
 }
@@ -36,8 +31,7 @@ export async function updateMerchant(req: Request, res: Response) {
 export async function disableMerchanr(req: Request, res: Response) {
   const merchant = await merchantService.updateMerchant(req.params.id, { isActive: false, disabledAt: new Date() });
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(204).end();
 }
@@ -45,8 +39,7 @@ export async function disableMerchanr(req: Request, res: Response) {
 export async function enableMerchant(req: Request, res: Response) {
   const merchant = await merchantService.updateMerchant(req.params.id, { isActive: true, disabledAt: null });
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(204).end();
 }
@@ -59,8 +52,7 @@ export async function deleteMerchant(req: Request, res: Response) {
 export async function verifyMerchant(req: Request, res: Response) {
   const merchant = await merchantService.updateMerchant(req.params.id, { isVerified: true, verifiedAt: new Date() });
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(204).end();
 }
@@ -68,8 +60,7 @@ export async function verifyMerchant(req: Request, res: Response) {
 export async function unverifyMerchant(req: Request, res: Response) {
   const merchant = await merchantService.updateMerchant(req.params.id, { isVerified: false, verifiedAt: null });
   if (!merchant) {
-    res.status(404).end();
-    return;
+    throw new NotFoundError('Merchant')
   }
   res.status(204).end();
 }
