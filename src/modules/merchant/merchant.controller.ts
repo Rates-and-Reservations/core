@@ -9,7 +9,7 @@ export async function createMerchant(req: Request, res: Response) {
 
 export async function getMerchants(req: Request, res: Response) {
   const merchants = await merchantService.listMerchants();
-  res.status(200).json(merchants);
+  res.json(merchants);
 }
 
 export async function getMerchant(req: Request, res: Response) {
@@ -17,7 +17,7 @@ export async function getMerchant(req: Request, res: Response) {
   if (!merchant) {
     throw new NotFoundError('Merchant')
   }
-  res.status(200).json(merchant);
+  res.json(merchant);
 }
 
 export async function updateMerchant(req: Request, res: Response) {
@@ -25,7 +25,7 @@ export async function updateMerchant(req: Request, res: Response) {
   if (!merchant) {
     throw new NotFoundError('Merchant')
   }
-  res.status(200).json(merchant);
+  res.json(merchant);
 }
 
 export async function disableMerchanr(req: Request, res: Response) {

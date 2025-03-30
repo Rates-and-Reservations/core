@@ -1,22 +1,40 @@
 import e, { Request, Response } from "express";
-import * as merchantContactService from "@/services/merchantContact.service";
-
-/**
- * #### Merchant Contact
-
-* Get user's merchant contacts
-* Get merchant contact by Id
-* Create merchant contact
-* Update merchant contact
-* Delete merchant contact
- */
+import * as merchantContactService from "@/services/merchantcontact.service";
+import * as customerService from "@/customServices/merchantContact.service";
 
 export const listMerchantContacts = async (req: Request, res: Response) => {
-  try {
-    const merchantContacts = await merchantContactService.listMerchantContacts();
-    res.json(merchantContacts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const merchantId = req.headers['x-merchant-id'] as string;
+  const merchantContacts = await merchantContactService.listMerchantContacts({ merchantId });
+  res.json(merchantContacts);
 }
 
+export const getMerchantContactById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const merchantContact = await merchantContactService.getMerchantContactById(id);
+  res.json(merchantContact);
+}
+
+export const createMerchantContact = async (req: Request, res: Response) => {
+  const { body } = req;
+  const merchantContact = await merchantContactService.createMerchantContact(body);
+  res.status(201).json(merchantContact);
+}
+
+export const updateMerchantContact = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { body } = req;
+  const merchantContact = await merchantContactService.updateMerchantContact(id, body);
+  res.json(merchantContact);
+}
+
+export const deleteMerchantContact = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  await merchantContactService.deleteMerchantContact(id);
+  res.status(204).end();
+}
+
+export const markAsDefault = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const merchantContact = await customerService.markAsDefaultContact(id);
+  res.json(merchantContact);
+}

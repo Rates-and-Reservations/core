@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "lib": ["es2021"],
+    "lib": [
+      "es2021"
+    ],
     "module": "CommonJS",
     "outDir": "./dist",
     "rootDir": "./",
@@ -9,8 +11,11 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
     "baseUrl": ".",
+    "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     }
   }
 }
