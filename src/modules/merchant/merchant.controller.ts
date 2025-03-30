@@ -2,8 +2,12 @@ import { Request, Response } from "express";
 import * as merchantService from "@/services/merchant.service";
 
 export async function createMerchant(req: Request, res: Response) {
-  const merchant = await merchantService.createMerchant(req.body);
-  res.status(201).json(merchant);
+  try {
+    const merchant = await merchantService.createMerchant(req.body);
+    res.status(201).json(merchant);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 }
 
 export async function getMerchants(req: Request, res: Response) {

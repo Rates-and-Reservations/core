@@ -9,6 +9,7 @@ import cors from 'cors';
 import { clerkMiddleware } from '@clerk/express'
 
 import routes from './routes';
+import errorHandler from '@/middleware/error-handler.middleware';
 
 
 // Load environment variables
@@ -27,6 +28,8 @@ app.use(clerkMiddleware())
 
 // Routes
 app.use('/api', routes);
+
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
