@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { StringFilterSchema } from './StringFilterSchema';
 import { EnumOrganisationRolesFilterSchema } from './EnumOrganisationRolesFilterSchema';
 import { OrganisationRolesSchema } from './OrganisationRolesSchema';
+import { BoolFilterSchema } from './BoolFilterSchema';
 import { DateTimeFilterSchema } from './DateTimeFilterSchema';
 
 export const MerchantUserScalarWhereInputSchema: z.ZodType<Prisma.MerchantUserScalarWhereInput> = z.object({
@@ -14,6 +15,8 @@ export const MerchantUserScalarWhereInputSchema: z.ZodType<Prisma.MerchantUserSc
   merchantId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   role: z.union([ z.lazy(() => EnumOrganisationRolesFilterSchema),z.lazy(() => OrganisationRolesSchema) ]).optional(),
+  isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
+  isVerified: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();

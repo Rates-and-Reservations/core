@@ -11,6 +11,8 @@ export const MerchantUserSelectSchema: z.ZodType<Prisma.MerchantUserSelect> = z.
   merchantId: z.boolean().optional(),
   userId: z.boolean().optional(),
   role: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   merchant: z.union([z.boolean(),z.lazy(() => MerchantArgsSchema)]).optional(),

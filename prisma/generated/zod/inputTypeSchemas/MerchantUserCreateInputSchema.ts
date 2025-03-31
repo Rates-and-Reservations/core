@@ -8,6 +8,8 @@ export const MerchantUserCreateInputSchema: z.ZodType<Prisma.MerchantUserCreateI
   id: z.string().cuid().optional(),
   userId: z.string(),
   role: z.lazy(() => OrganisationRolesSchema),
+  isActive: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   merchant: z.lazy(() => MerchantCreateNestedOneWithoutMerchantUserInputSchema)

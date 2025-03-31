@@ -1,6 +1,6 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import * as merchantContactService from "@/services/merchantcontact.service";
-import * as customerService from "@/customServices/merchantContact.service";
+import * as merchantContactService_ from "@/customServices/merchantContact.service";
 
 export const listMerchantContacts = async (req: Request, res: Response) => {
   const merchantId = req.headers['x-merchant-id'] as string;
@@ -35,6 +35,6 @@ export const deleteMerchantContact = async (req: Request, res: Response) => {
 
 export const markAsDefault = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const merchantContact = await customerService.markAsDefaultContact(id);
+  const merchantContact = await merchantContactService_.markAsDefaultContact(id);
   res.json(merchantContact);
 }

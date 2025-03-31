@@ -128,6 +128,8 @@ model MerchantUser {
   merchantId String
   userId     String // Clerk user ID
   role       OrganisationRoles // e.g. OWNER, ADMIN, STAFF
+  isActive   Boolean           @default(true)
+  isVerified Boolean           @default(false)
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 }
@@ -1049,6 +1051,7 @@ model NotificationTemplate {
 }
 
 enum NotificationType {
+  MERCHANT_USER_INVITE
   BOOKING_CONFIRMED
   BOOKING_CANCELLED
   BOOKING_REMINDER

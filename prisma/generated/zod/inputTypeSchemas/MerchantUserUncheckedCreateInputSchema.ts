@@ -8,6 +8,8 @@ export const MerchantUserUncheckedCreateInputSchema: z.ZodType<Prisma.MerchantUs
   merchantId: z.string(),
   userId: z.string(),
   role: z.lazy(() => OrganisationRolesSchema),
+  isActive: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();

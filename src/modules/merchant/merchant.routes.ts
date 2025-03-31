@@ -13,3 +13,5 @@ router.put("/:id/disable", asyncHandler(controller.disableMerchanr));
 router.put("/:id/enable", asyncHandler(controller.enableMerchant));
 router.put("/:id/verify", asyncHandler(controller.verifyMerchant));
 router.put("/:id/unverify", asyncHandler(controller.unverifyMerchant));
+
+export default router;

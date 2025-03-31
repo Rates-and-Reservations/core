@@ -16,6 +16,7 @@ Core API
 
 #### Merchant User
 
+* List merchant's users
 * Invite users
 * Modify merchant user role
 * Remove user from organisations

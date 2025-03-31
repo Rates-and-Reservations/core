@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { StringWithAggregatesFilterSchema } from './StringWithAggregatesFilterSchema';
 import { EnumOrganisationRolesWithAggregatesFilterSchema } from './EnumOrganisationRolesWithAggregatesFilterSchema';
 import { OrganisationRolesSchema } from './OrganisationRolesSchema';
+import { BoolWithAggregatesFilterSchema } from './BoolWithAggregatesFilterSchema';
 import { DateTimeWithAggregatesFilterSchema } from './DateTimeWithAggregatesFilterSchema';
 
 export const MerchantUserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.MerchantUserScalarWhereWithAggregatesInput> = z.object({
@@ -14,6 +15,8 @@ export const MerchantUserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.
   merchantId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   role: z.union([ z.lazy(() => EnumOrganisationRolesWithAggregatesFilterSchema),z.lazy(() => OrganisationRolesSchema) ]).optional(),
+  isActive: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
+  isVerified: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
