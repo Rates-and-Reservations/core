@@ -57,8 +57,6 @@ Core API
 * Delete resource
 * Check availability
 * Get resource rates
-* Add image to resource
-* Delete image
 
 #### Resource Configuration
 

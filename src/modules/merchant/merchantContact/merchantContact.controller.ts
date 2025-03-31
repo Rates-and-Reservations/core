@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as merchantContactService from "@/services/merchantcontact.service";
-import * as merchantContactService_ from "@/customServices/merchantContact.service";
+import * as merchantContactService_ from "@/modules/merchant/merchantContact/merchantContact.service";
 
 export const listMerchantContacts = async (req: Request, res: Response) => {
   const merchantId = req.headers['x-merchant-id'] as string;

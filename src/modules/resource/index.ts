@@ -1,0 +1,1 @@
+export * as resourceRoutes from "./resource/resource.routes";
