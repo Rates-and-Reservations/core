@@ -14,6 +14,7 @@ export const ResourceSchema = z.object({
   capacity: z.number().int(),
   metadata: JsonValueSchema.nullable(),
   tags: z.string().array(),
+  isActive: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

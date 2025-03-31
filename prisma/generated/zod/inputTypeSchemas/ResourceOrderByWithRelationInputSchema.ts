@@ -20,6 +20,7 @@ export const ResourceOrderByWithRelationInputSchema: z.ZodType<Prisma.ResourceOr
   capacity: z.lazy(() => SortOrderSchema).optional(),
   metadata: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   tags: z.lazy(() => SortOrderSchema).optional(),
+  isActive: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   merchant: z.lazy(() => MerchantOrderByWithRelationInputSchema).optional(),

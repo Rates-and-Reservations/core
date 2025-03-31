@@ -26,6 +26,7 @@ export const ResourceSelectSchema: z.ZodType<Prisma.ResourceSelect> = z.object({
   capacity: z.boolean().optional(),
   metadata: z.boolean().optional(),
   tags: z.boolean().optional(),
+  isActive: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   merchant: z.union([z.boolean(),z.lazy(() => MerchantArgsSchema)]).optional(),

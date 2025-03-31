@@ -7,6 +7,7 @@ import { IntFieldUpdateOperationsInputSchema } from './IntFieldUpdateOperationsI
 import { NullableJsonNullValueInputSchema } from './NullableJsonNullValueInputSchema';
 import { InputJsonValueSchema } from './InputJsonValueSchema';
 import { ResourceUpdatetagsInputSchema } from './ResourceUpdatetagsInputSchema';
+import { BoolFieldUpdateOperationsInputSchema } from './BoolFieldUpdateOperationsInputSchema';
 import { DateTimeFieldUpdateOperationsInputSchema } from './DateTimeFieldUpdateOperationsInputSchema';
 
 export const ResourceUncheckedUpdateManyWithoutMerchantInputSchema: z.ZodType<Prisma.ResourceUncheckedUpdateManyWithoutMerchantInput> = z.object({
@@ -17,6 +18,7 @@ export const ResourceUncheckedUpdateManyWithoutMerchantInputSchema: z.ZodType<Pr
   capacity: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   tags: z.union([ z.lazy(() => ResourceUpdatetagsInputSchema),z.string().array() ]).optional(),
+  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();

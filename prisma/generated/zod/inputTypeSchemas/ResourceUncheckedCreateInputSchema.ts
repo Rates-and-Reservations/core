@@ -19,6 +19,7 @@ export const ResourceUncheckedCreateInputSchema: z.ZodType<Prisma.ResourceUnchec
   capacity: z.number().int(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   tags: z.union([ z.lazy(() => ResourceCreatetagsInputSchema),z.string().array() ]).optional(),
+  isActive: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   Rate: z.lazy(() => RateUncheckedCreateNestedManyWithoutResourceInputSchema).optional(),

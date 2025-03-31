@@ -18,6 +18,7 @@ export const ResourceOrderByWithAggregationInputSchema: z.ZodType<Prisma.Resourc
   capacity: z.lazy(() => SortOrderSchema).optional(),
   metadata: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   tags: z.lazy(() => SortOrderSchema).optional(),
+  isActive: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => ResourceCountOrderByAggregateInputSchema).optional(),

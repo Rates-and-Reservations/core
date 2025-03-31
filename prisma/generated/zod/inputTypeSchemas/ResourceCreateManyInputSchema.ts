@@ -14,6 +14,7 @@ export const ResourceCreateManyInputSchema: z.ZodType<Prisma.ResourceCreateManyI
   capacity: z.number().int(),
   metadata: z.union([ z.lazy(() => NullableJsonNullValueInputSchema),InputJsonValueSchema ]).optional(),
   tags: z.union([ z.lazy(() => ResourceCreatetagsInputSchema),z.string().array() ]).optional(),
+  isActive: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();

@@ -7,6 +7,7 @@ import { StringNullableFilterSchema } from './StringNullableFilterSchema';
 import { IntFilterSchema } from './IntFilterSchema';
 import { JsonNullableFilterSchema } from './JsonNullableFilterSchema';
 import { StringNullableListFilterSchema } from './StringNullableListFilterSchema';
+import { BoolFilterSchema } from './BoolFilterSchema';
 import { DateTimeFilterSchema } from './DateTimeFilterSchema';
 import { MerchantScalarRelationFilterSchema } from './MerchantScalarRelationFilterSchema';
 import { MerchantWhereInputSchema } from './MerchantWhereInputSchema';
@@ -33,6 +34,7 @@ export const ResourceWhereUniqueInputSchema: z.ZodType<Prisma.ResourceWhereUniqu
   capacity: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
   tags: z.lazy(() => StringNullableListFilterSchema).optional(),
+  isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   merchant: z.union([ z.lazy(() => MerchantScalarRelationFilterSchema),z.lazy(() => MerchantWhereInputSchema) ]).optional(),

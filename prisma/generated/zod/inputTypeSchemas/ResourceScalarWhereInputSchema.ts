@@ -6,6 +6,7 @@ import { StringNullableFilterSchema } from './StringNullableFilterSchema';
 import { IntFilterSchema } from './IntFilterSchema';
 import { JsonNullableFilterSchema } from './JsonNullableFilterSchema';
 import { StringNullableListFilterSchema } from './StringNullableListFilterSchema';
+import { BoolFilterSchema } from './BoolFilterSchema';
 import { DateTimeFilterSchema } from './DateTimeFilterSchema';
 
 export const ResourceScalarWhereInputSchema: z.ZodType<Prisma.ResourceScalarWhereInput> = z.object({
@@ -20,6 +21,7 @@ export const ResourceScalarWhereInputSchema: z.ZodType<Prisma.ResourceScalarWher
   capacity: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   metadata: z.lazy(() => JsonNullableFilterSchema).optional(),
   tags: z.lazy(() => StringNullableListFilterSchema).optional(),
+  isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
