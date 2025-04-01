@@ -180,6 +180,8 @@ model ResourceTemplate {
 
   defaultFields Json?
 
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

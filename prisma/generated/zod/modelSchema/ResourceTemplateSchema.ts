@@ -12,6 +12,7 @@ export const ResourceTemplateSchema = z.object({
   category: z.string(),
   description: z.string().nullable(),
   defaultFields: JsonValueSchema.nullable(),
+  isActive: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
