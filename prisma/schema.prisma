@@ -12,6 +12,8 @@ generator zod {
   provider         = "zod-prisma-types"
   useMultipleFiles = true
   writeBarrelFiles = false
+  createInputTypes = false
+  createOutputTypes = false
 }
 
 datasource db {
