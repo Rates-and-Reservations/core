@@ -21,6 +21,8 @@ export const CancellationRequestSchema = z.object({
   declinedAt: z.coerce.date().nullable(),
   refundAmount: z.instanceof(Prisma.Decimal, { message: "Field 'refundAmount' must be a Decimal. Location: ['Models', 'CancellationRequest']"}).nullable(),
   notes: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

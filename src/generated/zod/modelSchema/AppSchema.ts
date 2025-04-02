@@ -20,6 +20,8 @@ export const AppSchema = z.object({
   isPublic: z.boolean(),
   isPublished: z.boolean(),
   isActive: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

@@ -9,11 +9,11 @@ generator client {
 }
 
 generator zod {
-  provider         = "zod-prisma-types"
-  output           = "../src/generated/zod"
-  useMultipleFiles = true
-  writeBarrelFiles = false
-  createInputTypes = false
+  provider          = "zod-prisma-types"
+  output            = "../src/generated/zod"
+  useMultipleFiles  = true
+  writeBarrelFiles  = false
+  createInputTypes  = false
   createOutputTypes = false
 }
 
@@ -45,6 +45,9 @@ model Merchant {
 
   verifiedAt DateTime?
   disabledAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,17 +114,19 @@ model Merchant {
 
 //  MerchantContact: Contact details for the merchant
 model MerchantContact {
-  id         String   @id @default(cuid())
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  id         String    @id @default(cuid())
+  merchant   Merchant  @relation(fields: [merchantId], references: [id])
   merchantId String
   email      String
   phone      String
   address    String
   city       String
   postcode   String
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  isDefault  Boolean   @default(false)
+  isDeleted  Boolean   @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 //  MerchantUser: Represents a user within the merchant's organisation
@@ -133,21 +138,25 @@ model MerchantUser {
   role       OrganisationRoles // e.g. OWNER, ADMIN, STAFF
   isActive   Boolean           @default(true)
   isVerified Boolean           @default(false)
+  isDeleted  Boolean           @default(false)
+  deletedAt  DateTime?
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
 }
 
 //  MerchantAsset: Represents a file or asset uploaded by the merchant
 model MerchantAsset {
-  id         String   @id @default(cuid())
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  id         String    @id @default(cuid())
+  merchant   Merchant  @relation(fields: [merchantId], references: [id])
   merchantId String
   name       String
   type       String
   url        String
   publicId   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  isDeleted  Boolean   @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   ResourceAsset ResourceAsset[]
 }
@@ -181,7 +190,8 @@ model ResourceTemplate {
 
   defaultFields Json?
 
-  isActive Boolean @default(true)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -207,6 +217,9 @@ model Resource {
   tags String[]
 
   isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -243,6 +256,9 @@ model ResourceBookingConfig {
 
   isActive Boolean @default(true) // resource booking on/off
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -257,10 +273,12 @@ model AddOn {
   description   String?
   price         Decimal
   currency      String
-  showInBooking Boolean  @default(true)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  showInBooking Boolean   @default(true)
+  isActive      Boolean   @default(true)
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   RateAddOn RateAddOn[]
 
@@ -280,6 +298,9 @@ model ResourceAsset {
 
   isPrimary Boolean @default(false) // Optional: for thumbnail/featured image
   sortOrder Int     @default(0) // Optional: for image ordering in galleries
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -324,6 +345,9 @@ model Rate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   Discount Discount[]
 
   RateAddOn RateAddOn[]
@@ -352,6 +376,9 @@ model RateAddOn {
   rate  Rate  @relation(fields: [rateId], references: [id])
   addOn AddOn @relation(fields: [addOnId], references: [id])
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -378,6 +405,9 @@ model Discount {
 
   isActive Boolean @default(true)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -403,6 +433,8 @@ model BookingTemplate {
   selectionMode SelectionMode // SINGLE or MULTI
   config        Json // Arbitrary config like required fields, limits, etc.
   actions       BookingAction[] // List of actions this template expects
+  isDeleted     Boolean         @default(false)
+  deletedAt     DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
@@ -420,9 +452,10 @@ model BookingAction {
   config                    Json // e.g., resource IDs, allowed date range, etc.
   required                  Boolean                     @default(true)
   BookingRequestActionValue BookingRequestActionValue[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isDeleted                 Boolean                     @default(false)
+  deletedAt                 DateTime?
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
 }
 
 // UiTemplate: Represents a template for the booking UI
@@ -438,6 +471,9 @@ model UiTemplate {
   config     Json // Branding, layout, custom fields
 
   uiTheme String? // URL to custom layout/theme
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -484,6 +520,8 @@ model BookingRequest {
   status            BookingRequestStatus // INITIATED | IN_PROGRESS | COMPLETED | FAILED
   actionStatus      Json // { actionId: status } mapping, optional details
   finalizedSnapshot Json?
+  isDeleted         Boolean              @default(false)
+  deletedAt         DateTime?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
 
@@ -503,6 +541,8 @@ model BookingRequestActionValue {
   bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id])
   value            Json // Can be a resourceId, date range, array of add-ons, etc.
   completedAt      DateTime       @default(now())
+  isDeleted        Boolean        @default(false)
+  deletedAt        DateTime?
   createdAt        DateTime       @default(now())
 }
 
@@ -536,6 +576,9 @@ model BookingRequestFlow {
   isActive  Boolean   @default(true)
   expiresAt DateTime?
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -558,6 +601,9 @@ model BookingItem {
   bookingRateSnapshot   BookingRateSnapshot @relation(fields: [bookingRateSnapshotId], references: [id])
 
   status BookingItemStatus @default(CONFIRMED) // Useful for partial success flows
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -601,6 +647,9 @@ model Booking {
 
   metadata Json?
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -636,6 +685,9 @@ model BookingItemAddOn {
   quantity   Int     @default(1)
   totalPrice Decimal
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -654,6 +706,9 @@ model BookingAddOn {
   quantity   Int     @default(1)
   unitPrice  Decimal
   totalPrice Decimal
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -685,6 +740,9 @@ model BookingRateSnapshot {
   taxType   TaxType @default(PERCENTAGE)
   taxAmount Decimal @default(0)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -714,6 +772,9 @@ model Customer {
   country  String?
 
   metadata Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -754,6 +815,9 @@ model WaitlistEntry {
   notifiedAt DateTime?
   promotedAt DateTime? // If they were converted into a booking
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -787,6 +851,9 @@ model PaymentActions {
 
   refundedAmount Decimal @default(0)
   paymentMethod  String? // e.g., "card", "wallet"
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -833,6 +900,9 @@ model Invoice {
   notes  String?
   pdfUrl String? // Link to generated PDF (optional)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -857,6 +927,9 @@ model InvoicePayment {
 
   amountPaid Decimal
   paidAt     DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -889,6 +962,9 @@ model RefundRequest {
   requestedAt DateTime @default(now())
 
   processedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -923,8 +999,12 @@ model RefundLog {
   errorMessage String?
 
   processedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum RefundStatus {
@@ -947,6 +1027,9 @@ model CancellationPolicy {
   timeLimitHours Int? // How many hours before booking start is allowed
 
   appliesTo CancellationScope @default(BOOKING) // BOOKING or ITEM
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -987,6 +1070,9 @@ model CancellationRequest {
 
   refundAmount Decimal?
   notes        String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1034,9 +1120,13 @@ model Notification {
   status       NotificationStatus @default(PENDING)
   errorMessage String?
 
-  sentAt    DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  sentAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // NotificationTemplate: Represents a template for a notification message
@@ -1050,6 +1140,9 @@ model NotificationTemplate {
   body    String // Can support variables: {{customerName}}, {{bookingDate}}
 
   isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1104,6 +1197,9 @@ model App {
   isPublished Boolean @default(false)
   isActive    Boolean @default(true)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1127,6 +1223,9 @@ model AppInstall {
   installedAt   DateTime?
   uninstalledAt DateTime?
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -1147,6 +1246,9 @@ model AppScope {
   name        String // e.g., "bookings:read"
   description String?
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
 
   AppInstallScope AppInstallScope[]
@@ -1161,6 +1263,9 @@ model AppInstallScope {
 
   scopeId String
   scope   AppScope @relation(fields: [scopeId], references: [id])
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
 }
@@ -1180,6 +1285,9 @@ model OAuthToken {
   expiresAt    DateTime?
 
   scopes Json? // Optional: list of granted scopes
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -1209,6 +1317,9 @@ model ApiUsageLog {
   responseTimeMs    Int // Response time in milliseconds
   rateLimitExceeded Boolean @default(false)
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
 }
 
@@ -1227,6 +1338,9 @@ model ApiUsageStat {
   successCount  Int // 2xx responses
   errorCount    Int // 4xx, 5xx responses
   rateLimitHits Int
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
 }
@@ -1287,6 +1401,9 @@ model AuditLog {
   performedAt DateTime?
   performedBy String? // Clerk user ID or system
 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
   createdAt DateTime @default(now())
 }
 
@@ -1308,8 +1425,12 @@ model ApiKey {
   isActive Boolean @default(true)
 
   lastUsedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   ApiUsageLog ApiUsageLog[]
 
@@ -1328,6 +1449,9 @@ model WebhookEndpoint {
   events Json // ["booking.created", "payment.successful"]
 
   isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1355,9 +1479,13 @@ model WebhookEvent {
   retryCount  Int       @default(0)
   nextRetryAt DateTime?
 
-  sentAt    DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  sentAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   WebhookEventLog WebhookEventLog[]
 }

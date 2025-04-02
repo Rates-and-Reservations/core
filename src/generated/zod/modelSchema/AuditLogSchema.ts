@@ -16,6 +16,8 @@ export const AuditLogSchema = z.object({
   userAgent: z.string().nullable(),
   performedAt: z.coerce.date().nullable(),
   performedBy: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
 })
 

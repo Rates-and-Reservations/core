@@ -14,6 +14,8 @@ export const AddOnSchema = z.object({
   currency: z.string(),
   showInBooking: z.boolean(),
   isActive: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

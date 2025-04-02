@@ -14,6 +14,8 @@ export const UiTemplateSchema = z.object({
   merchantId: z.string().nullable(),
   config: JsonValueSchema,
   uiTheme: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

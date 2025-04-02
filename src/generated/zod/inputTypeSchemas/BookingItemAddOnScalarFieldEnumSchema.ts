@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const BookingItemAddOnScalarFieldEnumSchema = z.enum(['id','bookingItemId','addOnId','addOnName','unitPrice','quantity','totalPrice','createdAt','updatedAt']);
+export const BookingItemAddOnScalarFieldEnumSchema = z.enum(['id','bookingItemId','addOnId','addOnName','unitPrice','quantity','totalPrice','isDeleted','deletedAt','createdAt','updatedAt']);
 
 export default BookingItemAddOnScalarFieldEnumSchema;

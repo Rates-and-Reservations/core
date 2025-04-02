@@ -12,6 +12,8 @@ export const BookingItemSchema = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   bookingRateSnapshotId: z.string(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

@@ -21,6 +21,8 @@ export const MerchantSchema = z.object({
   isActive: z.boolean(),
   verifiedAt: z.coerce.date().nullable(),
   disabledAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

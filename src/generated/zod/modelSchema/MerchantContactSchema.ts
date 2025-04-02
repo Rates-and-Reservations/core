@@ -13,6 +13,8 @@ export const MerchantContactSchema = z.object({
   city: z.string(),
   postcode: z.string(),
   isDefault: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

@@ -23,6 +23,8 @@ export const InvoiceSchema = z.object({
   paidAt: z.coerce.date().nullable(),
   notes: z.string().nullable(),
   pdfUrl: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

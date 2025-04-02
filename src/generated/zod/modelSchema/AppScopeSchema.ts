@@ -8,6 +8,8 @@ export const AppScopeSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),
   description: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
 })
 

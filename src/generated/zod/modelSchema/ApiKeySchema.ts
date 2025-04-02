@@ -14,6 +14,8 @@ export const ApiKeySchema = z.object({
   scopes: JsonValueSchema.nullable(),
   isActive: z.boolean(),
   lastUsedAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

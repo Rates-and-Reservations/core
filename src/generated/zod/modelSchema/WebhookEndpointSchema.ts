@@ -13,6 +13,8 @@ export const WebhookEndpointSchema = z.object({
   secret: z.string(),
   events: JsonValueSchema,
   isActive: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

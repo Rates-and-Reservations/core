@@ -10,6 +10,8 @@ export const ResourceAssetSchema = z.object({
   assetId: z.string(),
   isPrimary: z.boolean(),
   sortOrder: z.number().int(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

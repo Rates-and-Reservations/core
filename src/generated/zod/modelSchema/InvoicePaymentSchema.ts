@@ -11,6 +11,8 @@ export const InvoicePaymentSchema = z.object({
   paymentId: z.string(),
   amountPaid: z.instanceof(Prisma.Decimal, { message: "Field 'amountPaid' must be a Decimal. Location: ['Models', 'InvoicePayment']"}),
   paidAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

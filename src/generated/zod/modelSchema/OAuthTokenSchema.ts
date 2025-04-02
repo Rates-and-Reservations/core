@@ -13,6 +13,8 @@ export const OAuthTokenSchema = z.object({
   refreshToken: z.string().nullable(),
   expiresAt: z.coerce.date().nullable(),
   scopes: JsonValueSchema.nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

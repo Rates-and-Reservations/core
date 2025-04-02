@@ -12,6 +12,8 @@ export const MerchantUserSchema = z.object({
   userId: z.string(),
   isActive: z.boolean(),
   isVerified: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

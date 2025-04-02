@@ -13,6 +13,8 @@ export const ApiUsageStatSchema = z.object({
   successCount: z.number().int(),
   errorCount: z.number().int(),
   rateLimitHits: z.number().int(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
 })
 

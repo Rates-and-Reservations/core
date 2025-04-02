@@ -19,6 +19,8 @@ export const BookingRequestSchema = z.object({
   notes: z.string().nullable(),
   actionStatus: JsonValueSchema,
   finalizedSnapshot: JsonValueSchema.nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

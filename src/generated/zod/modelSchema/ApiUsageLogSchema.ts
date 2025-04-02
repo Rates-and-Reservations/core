@@ -15,6 +15,8 @@ export const ApiUsageLogSchema = z.object({
   userAgent: z.string().nullable(),
   responseTimeMs: z.number().int(),
   rateLimitExceeded: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
 })
 

@@ -13,6 +13,8 @@ export const BookingItemAddOnSchema = z.object({
   unitPrice: z.instanceof(Prisma.Decimal, { message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'BookingItemAddOn']"}),
   quantity: z.number().int(),
   totalPrice: z.instanceof(Prisma.Decimal, { message: "Field 'totalPrice' must be a Decimal. Location: ['Models', 'BookingItemAddOn']"}),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

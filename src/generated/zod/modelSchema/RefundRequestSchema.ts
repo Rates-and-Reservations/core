@@ -21,6 +21,8 @@ export const RefundRequestSchema = z.object({
   requestedBy: z.string().nullable(),
   requestedAt: z.coerce.date(),
   processedAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

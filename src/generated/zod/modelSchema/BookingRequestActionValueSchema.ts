@@ -11,6 +11,8 @@ export const BookingRequestActionValueSchema = z.object({
   bookingActionId: z.string(),
   value: JsonValueSchema,
   completedAt: z.coerce.date(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
 })
 

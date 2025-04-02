@@ -16,6 +16,8 @@ export const CustomerSchema = z.object({
   postcode: z.string().nullable(),
   country: z.string().nullable(),
   metadata: JsonValueSchema.nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

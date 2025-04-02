@@ -17,6 +17,8 @@ export const WaitlistEntrySchema = z.object({
   priority: z.number().int(),
   notifiedAt: z.coerce.date().nullable(),
   promotedAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

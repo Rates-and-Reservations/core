@@ -17,6 +17,8 @@ export const BookingSchema = z.object({
   notes: z.string().nullable(),
   internalNotes: z.string().nullable(),
   metadata: JsonValueSchema.nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

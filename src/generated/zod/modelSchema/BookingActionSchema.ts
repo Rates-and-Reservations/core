@@ -13,6 +13,8 @@ export const BookingActionSchema = z.object({
   name: z.string(),
   config: JsonValueSchema,
   required: z.boolean(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

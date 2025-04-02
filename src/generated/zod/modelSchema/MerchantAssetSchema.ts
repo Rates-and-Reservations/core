@@ -11,6 +11,8 @@ export const MerchantAssetSchema = z.object({
   type: z.string(),
   url: z.string(),
   publicId: z.string(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

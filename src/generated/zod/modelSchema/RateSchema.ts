@@ -28,6 +28,8 @@ export const RateSchema = z.object({
   taxAmount: z.instanceof(Prisma.Decimal, { message: "Field 'taxAmount' must be a Decimal. Location: ['Models', 'Rate']"}),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
 })
 
 export type Rate = z.infer<typeof RateSchema>

@@ -23,6 +23,8 @@ export const BookingRateSnapshotSchema = z.object({
   usageStartDate: z.coerce.date().nullable(),
   usageEndDate: z.coerce.date().nullable(),
   taxAmount: z.instanceof(Prisma.Decimal, { message: "Field 'taxAmount' must be a Decimal. Location: ['Models', 'BookingRateSnapshot']"}),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

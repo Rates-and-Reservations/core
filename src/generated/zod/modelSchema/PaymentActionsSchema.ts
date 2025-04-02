@@ -17,6 +17,8 @@ export const PaymentActionsSchema = z.object({
   currency: z.string(),
   refundedAmount: z.instanceof(Prisma.Decimal, { message: "Field 'refundedAmount' must be a Decimal. Location: ['Models', 'PaymentActions']"}),
   paymentMethod: z.string().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

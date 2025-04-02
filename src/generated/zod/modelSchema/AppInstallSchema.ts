@@ -12,6 +12,8 @@ export const AppInstallSchema = z.object({
   appId: z.string(),
   installedAt: z.coerce.date().nullable(),
   uninstalledAt: z.coerce.date().nullable(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
