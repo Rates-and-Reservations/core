@@ -24,6 +24,14 @@ app.use(clerkMiddleware())
 
 // Routes
 app.use('/api', routes);
+app.use('api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    message: 'API is running',
+    timestamp: new Date(),
+  });
+});
 
 app.use(errorHandler);
 

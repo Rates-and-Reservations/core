@@ -27,6 +27,7 @@ datasource db {
  */
 
 //  Merchant: The main entity representing a business or organisation
+/// @group Merchant
 model Merchant {
   id           String       @id @default(cuid())
   name         String
@@ -113,6 +114,7 @@ model Merchant {
 }
 
 //  MerchantContact: Contact details for the merchant
+/// @group Merchant
 model MerchantContact {
   id         String    @id @default(cuid())
   merchant   Merchant  @relation(fields: [merchantId], references: [id])
@@ -130,6 +132,7 @@ model MerchantContact {
 }
 
 //  MerchantUser: Represents a user within the merchant's organisation
+/// @group Merchant
 model MerchantUser {
   id         String            @id @default(cuid())
   merchant   Merchant          @relation(fields: [merchantId], references: [id])
@@ -145,6 +148,7 @@ model MerchantUser {
 }
 
 //  MerchantAsset: Represents a file or asset uploaded by the merchant
+/// @group Merchant
 model MerchantAsset {
   id         String    @id @default(cuid())
   merchant   Merchant  @relation(fields: [merchantId], references: [id])
@@ -179,6 +183,7 @@ enum OrganisationRoles {
  */
 
 // ResourceTemplate: Represents a template for a resource type
+/// @group Inventory
 model ResourceTemplate {
   id         String    @id @default(cuid())
   merchantId String?
@@ -200,6 +205,7 @@ model ResourceTemplate {
 }
 
 // Resource: Represents a physical or virtual resource that can be booked
+/// @group Inventory
 model Resource {
   id         String   @id @default(cuid())
   merchantId String
@@ -236,6 +242,7 @@ model Resource {
 }
 
 // ResourceBookingConfig: Represents the booking configuration for a resource
+/// @group Inventory
 model ResourceBookingConfig {
   id         String   @id @default(cuid())
   resourceId String
@@ -264,6 +271,7 @@ model ResourceBookingConfig {
 }
 
 // AddOn: Represents an additional service or item that can be attached to a booking
+/// @group Inventory
 model AddOn {
   id         String   @id @default(cuid())
   merchantId String
@@ -287,6 +295,7 @@ model AddOn {
   BookingAddOn BookingAddOn[]
 }
 
+/// @group Inventory
 model ResourceAsset {
   id String @id @default(cuid())
 
@@ -311,6 +320,7 @@ model ResourceAsset {
  */
 
 // Rate: Represents a pricing rate for a resource
+/// @group Pricing
 model Rate {
   id         String   @id @default(cuid())
   merchantId String
@@ -368,6 +378,7 @@ enum TaxType {
 }
 
 // RateAddOn: Represents an add-on that can be attached to a rate
+/// @group Pricing
 model RateAddOn {
   id      String @id @default(cuid())
   rateId  String
@@ -384,6 +395,7 @@ model RateAddOn {
 }
 
 // Discount: Represents a discount that can be applied to a rate
+/// @group Pricing
 model Discount {
   id         String   @id @default(cuid())
   merchantId String
@@ -422,6 +434,7 @@ enum DiscountType {
  */
 
 // BookingTemplate: Represents a template for a booking flow
+/// @group BookingConfiguration
 model BookingTemplate {
   id String @id @default(cuid())
 
@@ -442,6 +455,7 @@ model BookingTemplate {
 }
 
 // BookingAction: Represents a step or action in a booking flow
+/// @group BookingConfiguration
 model BookingAction {
   id                String          @id @default(cuid())
   bookingTemplateId String
@@ -459,6 +473,7 @@ model BookingAction {
 }
 
 // UiTemplate: Represents a template for the booking UI
+/// @group BookingConfiguration
 model UiTemplate {
   id              String  @id @default(cuid())
   name            String
@@ -496,6 +511,7 @@ enum ActionType {
 }
 
 // BookingRequest: Represents a booking request made by a customer
+/// @group BookingSetup
 model BookingRequest {
   id         String   @id @default(cuid())
   merchantId String
@@ -533,6 +549,7 @@ model BookingRequest {
 }
 
 // BookingRequestActionValue: Represent the state of a booking action in a request
+/// @group BookingSetup
 model BookingRequestActionValue {
   id               String         @id @default(cuid())
   bookingRequestId String
@@ -554,6 +571,7 @@ enum BookingRequestStatus {
 }
 
 // BookingRequestFlow: Represents a flow that can be shared for booking
+/// @group BookingSetup
 model BookingRequestFlow {
   id               String         @id @default(cuid())
   bookingRequestId String
@@ -588,6 +606,7 @@ model BookingRequestFlow {
  */
 
 // BookingItem: Represents a single item in a booking (e.g., room, table, ticket)
+/// @group Booking
 model BookingItem {
   id String @id @default(cuid())
 
@@ -624,6 +643,7 @@ enum BookingItemStatus {
 }
 
 // Booking: Represents a confirmed booking made by a customer
+/// @group Booking
 model Booking {
   id         String   @id @default(cuid())
   merchantId String
@@ -671,6 +691,7 @@ model Booking {
 }
 
 // BookingItemAddOn: Represents an add-on attached to a booking item
+/// @group Booking
 model BookingItemAddOn {
   id String @id @default(cuid())
 
@@ -693,6 +714,7 @@ model BookingItemAddOn {
 }
 
 // BookingAddOn: Represents an add-on attached to a booking
+/// @group Booking
 model BookingAddOn {
   id String @id @default(cuid())
 
@@ -715,6 +737,7 @@ model BookingAddOn {
 }
 
 // BookingRateSnapshot: Represents a snapshot of a rate at the time of booking
+/// @group Booking
 model BookingRateSnapshot {
   id String @id @default(cuid())
 
@@ -757,6 +780,7 @@ enum BookingStatus {
 }
 
 // Customer: Represents a customer who makes bookings
+/// @group Customer
 model Customer {
   id         String   @id @default(cuid())
   merchantId String
@@ -791,6 +815,7 @@ model Customer {
 }
 
 // WaitlistEntry: Represents a customer waiting for a resource
+/// @group Waitlist
 model WaitlistEntry {
   id String @id @default(cuid())
 
@@ -834,6 +859,7 @@ enum WaitlistStatus {
  */
 
 // PaymentActions: Represents a payment transaction for a booking
+/// @group Payment
 model PaymentActions {
   id        String  @id @default(cuid())
   bookingId String
@@ -873,6 +899,7 @@ enum PaymentStatus {
 }
 
 // Invoice: Represents an invoice for a booking or payment
+/// @group Payment
 model Invoice {
   id         String   @id @default(cuid())
   merchantId String
@@ -917,6 +944,7 @@ enum InvoiceStatus {
 }
 
 // InvoicePayment: Represents a payment made against an invoice
+/// @group Payment
 model InvoicePayment {
   id        String  @id @default(cuid())
   invoiceId String
@@ -936,6 +964,7 @@ model InvoicePayment {
 }
 
 // InvoicePayment: Represents a payment made against an invoice
+/// @group Payment
 model RefundRequest {
   id String @id @default(cuid())
 
@@ -980,6 +1009,7 @@ enum RefundRequestStatus {
 }
 
 // RefundLog: Represents a log entry for a refund transaction
+/// @group Payment
 model RefundLog {
   id String @id @default(cuid())
 
@@ -1014,6 +1044,7 @@ enum RefundStatus {
 }
 
 // CancelationPolicy: Represents a policy for booking cancellations
+/// @group Booking
 model CancellationPolicy {
   id String @id @default(cuid())
 
@@ -1049,6 +1080,7 @@ enum CancellationScope {
 }
 
 // CancellationRequest: Represents a request to cancel a booking
+/// @group Booking
 model CancellationRequest {
   id String @id @default(cuid())
 
@@ -1096,6 +1128,7 @@ enum CancellationSource {
  */
 
 // Notification: Represents a notification message sent to a customer or merchant
+/// @group Notification
 model Notification {
   id         String   @id @default(cuid())
   merchantId String
@@ -1130,6 +1163,7 @@ model Notification {
 }
 
 // NotificationTemplate: Represents a template for a notification message
+/// @group Notification
 model NotificationTemplate {
   id         String              @id @default(cuid())
   merchantId String
@@ -1174,6 +1208,7 @@ enum NotificationStatus {
  */
 
 // App: Represents a third-party app or integration
+/// @group App
 model App {
   id String @id @default(cuid())
 
@@ -1209,6 +1244,7 @@ model App {
 }
 
 // AppInstall: Represents an installed instance of an app
+/// @group App
 model AppInstall {
   id String @id @default(cuid())
 
@@ -1240,6 +1276,7 @@ enum AppInstallStatus {
 }
 
 // AppScope: Represents a permission scope for an app
+/// @group App
 model AppScope {
   id String @id @default(cuid())
 
@@ -1255,6 +1292,7 @@ model AppScope {
 }
 
 // AppInstallScope: Represents a granted scope for an app install
+/// @group App
 model AppInstallScope {
   id String @id @default(cuid())
 
@@ -1271,6 +1309,7 @@ model AppInstallScope {
 }
 
 // OAuthToken: Represents an OAuth token for an app install
+/// @group App
 model OAuthToken {
   id String @id @default(cuid())
 
@@ -1298,6 +1337,7 @@ model OAuthToken {
  */
 
 // ApiUsageLog: Represents a log entry for API usage
+/// @group Events
 model ApiUsageLog {
   id String @id @default(cuid())
 
@@ -1324,6 +1364,7 @@ model ApiUsageLog {
 }
 
 // ApiUsageStat: Represents a daily usage summary for an API key
+/// @group Events
 model ApiUsageStat {
   id String @id @default(cuid())
 
@@ -1346,6 +1387,7 @@ model ApiUsageStat {
 }
 
 // BookingActivityLog: Represents a log entry for booking activity
+/// @group Events
 model BookingActivityLog {
   id String @id @default(cuid())
 
@@ -1383,6 +1425,7 @@ enum BookingActionType {
 }
 
 // AuditLog: Represents a log entry for merchant activity
+/// @group Events
 model AuditLog {
   id         String   @id @default(cuid())
   merchantId String
@@ -1412,6 +1455,7 @@ model AuditLog {
  */
 
 // ApiKey: Represents an API key for merchant API access
+/// @group Developers
 model ApiKey {
   id         String   @id @default(cuid())
   merchantId String
@@ -1438,6 +1482,7 @@ model ApiKey {
 }
 
 // WebhookEndpoint: Represents a webhook URL for event notifications
+/// @group Developers
 model WebhookEndpoint {
   id         String   @id @default(cuid())
   merchantId String
@@ -1460,6 +1505,7 @@ model WebhookEndpoint {
 }
 
 // WebhookEvent: Represents an event to be sent to a webhook endpoint
+/// @group Developers
 model WebhookEvent {
   id         String   @id @default(cuid())
   merchantId String
@@ -1503,6 +1549,7 @@ enum WebhookEventStatus {
 }
 
 // The actual log of webhook events sent
+/// @group Developers
 model WebhookEventLog {
   id           String       @id @default(cuid())
   eventId      String
