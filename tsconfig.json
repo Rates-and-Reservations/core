@@ -9,14 +9,20 @@
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
+    "moduleResolution": "node",
     "strictNullChecks": true,
     "esModuleInterop": true,
     "baseUrl": ".",
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "typeRoots": ["./types", "./node_modules/@types"],
     "paths": {
       "@/*": [
         "src/*"
-      ]
+      ],
+      "@zod/*": ["prisma/generated/zod/*"]
     }
-  }
+  },
+  "include": ["src", "prisma/zod"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,4 +1,4 @@
-import MerchantSchema from "prisma/generated/zod/modelSchema/MerchantSchema";
+import MerchantSchema from "@zod/modelSchema/MerchantSchema";
 import { z } from "zod";
 
 export const CreateMerchantSchema = MerchantSchema.omit({
