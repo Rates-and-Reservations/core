@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await MerchantService.deleteMerchant(req.params.id);
   res.json(result);
 };
+
+
+/** Disable a user */
+export const disable = async (req: Request, res: Response) => {
+  // TODO: Implement disable
+  res.json({ message: 'disable not implemented' });
+};

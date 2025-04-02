@@ -1,0 +1,10 @@
+{
+  "Merchant": [
+    {
+      "name": "disable",
+      "method": "post",
+      "path": "/:id/disable",
+      "description": "Disable a user"
+    }
+  ]
+}
