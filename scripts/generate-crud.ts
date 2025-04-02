@@ -1,11 +1,53 @@
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env ts-node
 
-// PATHS
-const SERVICES_FOLDER = path.join(__dirname, '../src/services');
+import fs from 'fs';
+import path from 'path';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 1️⃣ Parse CLI arguments
+const argv = yargs(hideBin(process.argv))
+  .option('model', {
+    type: 'string',
+    describe: 'Generate CRUD service for a specific model',
+  })
+  .option('all', {
+    type: 'boolean',
+    default: false,
+    describe: 'Generate services for all models',
+  })
+  .option('new', {
+    type: 'boolean',
+    default: false,
+    describe: 'Only generate services for models without existing service files',
+  })
+  .option('output', {
+    type: 'string',
+    default: 'src/services',
+    describe: 'Output directory for generated service files',
+  })
+  .option('force', {
+    type: 'boolean',
+    default: false,
+    describe: 'Overwrite existing files if they exist',
+  })
+  .check((argv) => {
+    if (!argv.model && !argv.all && !argv.new) {
+      throw new Error('You must provide either --model, --all, or --new');
+    }
+    return true;
+  })
+  .help()
+  .parseSync();
+
+const SERVICES_FOLDER = path.join(__dirname, '..', argv.output);
 const SCHEMA_FILE = path.join(__dirname, '../prisma/schema.prisma');
 
-// 1️⃣ Parse model names from schema.prisma
+// 2️⃣ Parse model names from schema.prisma
 const schema = fs.readFileSync(SCHEMA_FILE, 'utf8');
 const modelRegex = /model\s+(\w+)\s+{/g;
 
@@ -15,7 +57,7 @@ while ((match = modelRegex.exec(schema)) !== null) {
   modelNames.push(match[1]);
 }
 
-// 2️⃣ Template for CRUD service
+// 3️⃣ Template
 const generateCrudService = (modelName: string) => {
   const instanceName = modelName.charAt(0).toLowerCase() + modelName.slice(1);
   const createInput = `${modelName}CreateInput`;
@@ -24,72 +66,74 @@ const generateCrudService = (modelName: string) => {
   return `import prisma from '@/clients/prisma';
 import { Prisma } from '@prisma/client';
 
-// Type Aliases
 type ${createInput} = Prisma.${modelName}CreateInput;
 type ${updateInput} = Prisma.${modelName}UpdateInput;
 
-// Create ${modelName}
 export const create${modelName} = async (data: ${createInput}) => {
-  return prisma.${instanceName}.create({
-    data,
-  });
+  return prisma.${instanceName}.create({ data });
 };
 
-// Get ${modelName} by ID
 export const get${modelName}ById = async (id: string) => {
-  return prisma.${instanceName}.findUnique({
-    where: { id },
-  });
+  return prisma.${instanceName}.findUnique({ where: { id } });
 };
 
-// List ${modelName}s
 export const list${modelName}s = async (filter: any = {}) => {
-  return prisma.${instanceName}.findMany({
-    where: filter,
-    orderBy: { createdAt: 'desc' },
-  });
+  return prisma.${instanceName}.findMany({ where: filter, orderBy: { createdAt: 'desc' } });
 };
 
-// Update ${modelName}
 export const update${modelName} = async (id: string, data: ${updateInput}) => {
+  return prisma.${instanceName}.update({ where: { id }, data });
+};
+
+export const delete${modelName} = async (id: string) => {
   return prisma.${instanceName}.update({
     where: { id },
-    data,
+    data: { deletedAt: new Date() },
   });
 };
 
-// Delete ${modelName}
-export const delete${modelName} = async (id: string) => {
-  return prisma.${instanceName}.delete({
-    where: { id },
-  });
-};
+// export const delete${modelName} = async (id: string) => {
+//   return prisma.${instanceName}.delete({ where: { id } });
+// };
 `;
 };
 
-
-// Ensure SERVICES_FOLDER exists
+// 4️⃣ Ensure output folder exists
 if (!fs.existsSync(SERVICES_FOLDER)) {
   fs.mkdirSync(SERVICES_FOLDER, { recursive: true });
-  console.log('✅ Created folder: src/services');
+  console.log(`✅ Created folder: ${argv.output}`);
 }
 
-let count = 0;
-// 3️⃣ Generate service files
-modelNames.forEach(modelName => {
-  
-  // Skip if the service file already exists
-  const serviceFilePath = path.join(SERVICES_FOLDER, `${modelName.toLowerCase()}.service.ts`);
-  if (fs.existsSync(serviceFilePath)) {
-    return;
-  }
-  count++;
-  const serviceCode = generateCrudService(modelName);
+// 5️⃣ Generate files
+let generatedCount = 0;
+
+const modelsToGenerate =
+  argv.model
+    ? [argv.model]
+    : argv.all
+    ? modelNames
+    : argv.new
+    ? modelNames.filter(
+        (model) =>
+          !fs.existsSync(path.join(SERVICES_FOLDER, `${model.toLowerCase()}.service.ts`))
+      )
+    : [];
+
+modelsToGenerate.forEach((modelName) => {
   const fileName = `${modelName.toLowerCase()}.service.ts`;
   const filePath = path.join(SERVICES_FOLDER, fileName);
 
-  fs.writeFileSync(filePath, serviceCode);
-  console.log(`✅ Created CRUD service: ${fileName}`);
+  const alreadyExists = fs.existsSync(filePath);
+
+  if (alreadyExists && !argv.force) {
+    console.log(`⚠️ Skipped ${fileName} (already exists)`);
+    return;
+  }
+
+  const code = generateCrudService(modelName);
+  fs.writeFileSync(filePath, code);
+  console.log(`${alreadyExists ? '♻️ Overwrote' : '✅ Created'} ${fileName}`);
+  generatedCount++;
 });
 
-console.log(`\n✅ ${count} CRUD service files generated successfully!`);
+console.log(`\n✨ ${generatedCount} CRUD service file(s) written to ${argv.output}`);
