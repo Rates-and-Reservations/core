@@ -7,7 +7,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { clerkMiddleware } from '@clerk/express'
 
-import routes from './routes';
+import routes from '@/modules/routes';
 import errorHandler from '@/middleware/error-handler.middleware';
 
 // Load environment variables
