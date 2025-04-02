@@ -23,8 +23,7 @@ app.use(morgan('dev'));
 app.use(clerkMiddleware())
 
 // Routes
-app.use('/api', routes);
-app.use('api/health', (req, res) => {
+app.use('/health', (req, res) => {
   res.status(200).json({
     status: 'ok',
     uptime: process.uptime(),
@@ -32,6 +31,8 @@ app.use('api/health', (req, res) => {
     timestamp: new Date(),
   });
 });
+app.use('/api', routes);
+
 
 app.use(errorHandler);
 
