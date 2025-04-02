@@ -9,7 +9,7 @@ const SCHEMA_FILE = path.join(__dirname, '../prisma/schema.prisma');
 const schema = fs.readFileSync(SCHEMA_FILE, 'utf8');
 const modelRegex = /model\s+(\w+)\s+{/g;
 
-const modelNames = [];
+const modelNames: string[] = [];
 let match;
 while ((match = modelRegex.exec(schema)) !== null) {
   modelNames.push(match[1]);
