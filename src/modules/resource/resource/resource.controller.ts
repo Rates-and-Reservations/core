@@ -25,7 +25,7 @@ export const updateResource = async (req: Request, res: Response) => {
 
 export const deleteResource = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await resourceService.updateResource(id, { isActive: true });
+  await resourceService.deleteResource(id);
   res.status(204).send();
 }
 

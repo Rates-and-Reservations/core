@@ -23,7 +23,7 @@ export const updateResourceConfig = async (req: Request, res: Response) => {
 
 export const deleteResourceConfig = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await resourcebookingconfigService.updateResourceBookingConfig(id, { isActive: true });
+  await resourcebookingconfigService.deleteResourceBookingConfig(id);
   res.status(204).send();
 }
 

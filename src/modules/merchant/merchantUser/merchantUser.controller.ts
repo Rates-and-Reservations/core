@@ -30,7 +30,7 @@ export const verifyMerchantUser = async (req: Request, res: Response) => {
 
 export const deleteMerchantUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await merchantUserService.updateMerchantUser(id, { isActive: true });
+  await merchantUserService.deleteMerchantUser(id);
   res.status(204).send();
 }
 

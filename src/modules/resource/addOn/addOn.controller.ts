@@ -23,7 +23,7 @@ export const updateAddOn = async (req: Request, res: Response) => {
 
 export const deleteAddOn = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await addOnService.updateAddOn(id, { isActive: true });
+  await addOnService.deleteAddOn(id);
   res.status(204).send();
 }
 

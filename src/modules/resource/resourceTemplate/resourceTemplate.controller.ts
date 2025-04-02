@@ -24,7 +24,7 @@ export const updateResourceTemplate = async (req: Request, res: Response) => {
 
 export const deleteResourceTemplate = async (req: Request, res: Response) => {
   const { id } = req.params;
-  await resourcetemplateService.updateResourceTemplate(id, { isActive: true });
+  await resourcetemplateService.deleteResourceTemplate(id);
   res.status(204).send();
 }
 
