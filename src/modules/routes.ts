@@ -1,3 +1,5 @@
+import invoiceHistoryRoutes from './Payment/invoiceHistory/invoiceHistory.routes';
+import invoiceItemRoutes from './Payment/invoiceItem/invoiceItem.routes';
 import webhookEventLogRoutes from './Developers/webhookEventLog/webhookEventLog.routes';
 import webhookEventRoutes from './Developers/webhookEvent/webhookEvent.routes';
 import webhookEndpointRoutes from './Developers/webhookEndpoint/webhookEndpoint.routes';
@@ -156,5 +158,9 @@ router.use('/webhookEndpoint', webhookEndpointRoutes);
 router.use('/webhookEvent', webhookEventRoutes);
 
 router.use('/webhookEventLog', webhookEventLogRoutes);
+
+router.use('/invoiceItem', invoiceItemRoutes);
+
+router.use('/invoiceHistory', invoiceHistoryRoutes);
 
 export default router;

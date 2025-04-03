@@ -25,3 +25,16 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await InvoiceService.deleteInvoice(req.params.id);
   res.json(result);
 };
+
+
+/** Download an invoice */
+export const download = async (req: Request, res: Response) => {
+  // TODO: Implement download
+  res.json({ message: 'download not implemented' });
+};
+
+/** Update the status of an invoice */
+export const updateStatus = async (req: Request, res: Response) => {
+  // TODO: Implement updateStatus
+  res.json({ message: 'updateStatus not implemented' });
+};

@@ -32,3 +32,15 @@ export const trigger = async (req: Request, res: Response) => {
   // TODO: Implement trigger
   res.json({ message: 'trigger not implemented' });
 };
+
+/** Send a test notification */
+export const sendTest = async (req: Request, res: Response) => {
+  // TODO: Implement sendTest
+  res.json({ message: 'sendTest not implemented' });
+};
+
+/** Update the status of a notification */
+export const updateStatus = async (req: Request, res: Response) => {
+  // TODO: Implement updateStatus
+  res.json({ message: 'updateStatus not implemented' });
+};

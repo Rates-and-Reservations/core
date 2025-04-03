@@ -1,5 +1,5 @@
 import express from 'express';
-import * as controller from './notification.controller';
+import * as controller from './invoiceItem.controller';
 
 const router = express.Router();
 
@@ -9,8 +9,5 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
-router.post('/:id/trigger', controller.trigger);
-router.post('/:id/test', controller.sendTest);
-router.post('/:id/status', controller.updateStatus);
 
 export default router;

@@ -827,6 +827,110 @@ enum BookingStatus {
   COMPLETED
 }
 
+// CancelationPolicy: Represents a policy for booking cancellations
+/// @group Booking
+model CancellationPolicy {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+
+  name           String
+  description    String?
+  refundType     RefundType // FULL, PARTIAL, NONE
+  refundAmount   Decimal? // Used if PARTIAL
+  timeLimitHours Int? // How many hours before booking start is allowed
+
+  appliesTo CancellationScope @default(BOOKING) // BOOKING or ITEM
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ResourceBookingConfig ResourceBookingConfig[]
+}
+
+enum RefundType {
+  FULL
+  PARTIAL
+  NONE
+}
+
+enum CancellationScope {
+  BOOKING
+  ITEM
+}
+
+// CancellationRequest: Represents a request to cancel a booking
+/// @group Booking
+model CancellationRequest {
+  id String @id @default(cuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  bookingItemId String?
+  bookingItem   BookingItem? @relation(fields: [bookingItemId], references: [id])
+
+  requestedBy String? // Clerk user or customer ID
+  reason      String?
+  source      CancellationSource @default(CUSTOMER) // CUSTOMER | SYSTEM | SUPPORT
+
+  currentStatus CancellationStatus @default(PENDING)
+
+  processedAt DateTime?
+  approvedBy  String?
+  approvedAt  DateTime?
+  declinedAt  DateTime?
+
+  refundAmount Decimal?
+  notes        String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CancellationRequestTransition CancellationRequestTransition[]
+}
+
+// CancellationRequestTransition: Represents a change in the status of a cancellation request
+/// @group Booking
+model CancellationRequestTransition {
+  id String @id @default(cuid())
+
+  cancellationRequestId String
+  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id])
+
+  fromStatus CancellationStatus
+  toStatus   CancellationStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum CancellationStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELLED
+}
+
+enum CancellationSource {
+  CUSTOMER
+  SUPPORT
+  SYSTEM
+}
+
 // Customer: Represents a customer who makes bookings
 /// @group Customer
 model Customer {
@@ -927,7 +1031,7 @@ enum WaitlistStatus {
 }
 
 /**
- * Payment, Invoicing Cancellation and Refund Models
+ * Payment, Invoicing and Refund Models
  */
 
 // PaymentActions: Represents a payment transaction for a booking
@@ -1006,6 +1110,49 @@ model Invoice {
   updatedAt DateTime @updatedAt
 
   InvoicePayment InvoicePayment[]
+
+  InvoiceItem InvoiceItem[]
+
+  InvoiceHistory InvoiceHistory[]
+}
+
+// InvoiceItem: Represents an item in an invoice
+/// @group Payment
+model InvoiceItem {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  description String
+  amount      Decimal
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// InvoiceHistory: Represents a history of changes to an invoice
+/// @group Payment
+model InvoiceHistory {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  fromStatus InvoiceStatus
+  toStatus   InvoiceStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum InvoiceStatus {
@@ -1115,112 +1262,8 @@ enum RefundStatus {
   FAILED
 }
 
-// CancelationPolicy: Represents a policy for booking cancellations
-/// @group Booking
-model CancellationPolicy {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name           String
-  description    String?
-  refundType     RefundType // FULL, PARTIAL, NONE
-  refundAmount   Decimal? // Used if PARTIAL
-  timeLimitHours Int? // How many hours before booking start is allowed
-
-  appliesTo CancellationScope @default(BOOKING) // BOOKING or ITEM
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ResourceBookingConfig ResourceBookingConfig[]
-}
-
-enum RefundType {
-  FULL
-  PARTIAL
-  NONE
-}
-
-enum CancellationScope {
-  BOOKING
-  ITEM
-}
-
-// CancellationRequest: Represents a request to cancel a booking
-/// @group Booking
-model CancellationRequest {
-  id String @id @default(cuid())
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  bookingItemId String?
-  bookingItem   BookingItem? @relation(fields: [bookingItemId], references: [id])
-
-  requestedBy String? // Clerk user or customer ID
-  reason      String?
-  source      CancellationSource @default(CUSTOMER) // CUSTOMER | SYSTEM | SUPPORT
-
-  currentStatus CancellationStatus @default(PENDING)
-
-  processedAt DateTime?
-  approvedBy  String?
-  approvedAt  DateTime?
-  declinedAt  DateTime?
-
-  refundAmount Decimal?
-  notes        String?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  CancellationRequestTransition CancellationRequestTransition[]
-}
-
-// CancellationRequestTransition: Represents a change in the status of a cancellation request
-/// @group Booking
-model CancellationRequestTransition {
-  id String @id @default(cuid())
-
-  cancellationRequestId String
-  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id])
-
-  fromStatus CancellationStatus
-  toStatus   CancellationStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum CancellationStatus {
-  PENDING
-  APPROVED
-  DECLINED
-  CANCELLED
-}
-
-enum CancellationSource {
-  CUSTOMER
-  SUPPORT
-  SYSTEM
-}
-
 /**
- * Booking Notifications and Messaging Models
+ * Notifications and Messaging Models
  */
 
 // Notification: Represents a notification message sent to a customer or merchant
