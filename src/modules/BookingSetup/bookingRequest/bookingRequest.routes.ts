@@ -9,5 +9,7 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
+router.post('/:id/cancel', controller.cancel);
+router.post('/:id/complete', controller.complete);
 
 export default router;

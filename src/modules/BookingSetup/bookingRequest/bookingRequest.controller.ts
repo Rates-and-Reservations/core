@@ -25,3 +25,16 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await BookingRequestService.deleteBookingRequest(req.params.id);
   res.json(result);
 };
+
+
+/** Cancel a booking request */
+export const cancel = async (req: Request, res: Response) => {
+  // TODO: Implement cancel
+  res.json({ message: 'cancel not implemented' });
+};
+
+/** Complete a booking request */
+export const complete = async (req: Request, res: Response) => {
+  // TODO: Implement complete
+  res.json({ message: 'complete not implemented' });
+};

@@ -215,10 +215,10 @@
       "description": "Cancel a booking"
     },
     {
-      "name": "update-status",
+      "name": "updateStatus",
       "method": "post",
-      "path": "/:id/complete",
-      "description": "Complete a booking"
+      "path": "/:id/status",
+      "description": "Update the status of a booking"
     }
   ]
 }

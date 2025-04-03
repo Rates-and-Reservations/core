@@ -1,5 +1,5 @@
 import express from 'express';
-import * as controller from './booking.controller';
+import * as controller from './bookingItemTransition.controller';
 
 const router = express.Router();
 
@@ -9,7 +9,5 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
-router.post('/:id/cancel', controller.cancel);
-router.post('/:id/status', controller.updateStatus);
 
 export default router;
