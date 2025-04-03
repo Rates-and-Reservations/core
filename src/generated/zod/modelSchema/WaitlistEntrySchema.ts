@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { WaitlistStatusSchema } from '../inputTypeSchemas/WaitlistStatusSchema'
 
 /////////////////////////////////////////
 // WAITLIST ENTRY SCHEMA
@@ -8,6 +9,7 @@ import { z } from 'zod';
  * @group Waitlist
  */
 export const WaitlistEntrySchema = z.object({
+  currentStatus: WaitlistStatusSchema,
   id: z.string().cuid(),
   merchantId: z.string(),
   resourceId: z.string(),

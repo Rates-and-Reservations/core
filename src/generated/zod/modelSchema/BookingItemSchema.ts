@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BookingItemStatusSchema } from '../inputTypeSchemas/BookingItemStatusSchema'
 
 /////////////////////////////////////////
 // BOOKING ITEM SCHEMA
@@ -8,6 +9,7 @@ import { z } from 'zod';
  * @group Booking
  */
 export const BookingItemSchema = z.object({
+  currentStatus: BookingItemStatusSchema,
   id: z.string().cuid(),
   bookingId: z.string(),
   startTime: z.coerce.date(),

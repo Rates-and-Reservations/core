@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { NotificationTypeSchema } from '../inputTypeSchemas/NotificationTypeSchema'
 import { NotificationChannelSchema } from '../inputTypeSchemas/NotificationChannelSchema'
-import { NotificationStatusSchema } from '../inputTypeSchemas/NotificationStatusSchema'
 
 /////////////////////////////////////////
 // NOTIFICATION SCHEMA
@@ -13,7 +12,6 @@ import { NotificationStatusSchema } from '../inputTypeSchemas/NotificationStatus
 export const NotificationSchema = z.object({
   type: NotificationTypeSchema,
   channel: NotificationChannelSchema,
-  status: NotificationStatusSchema,
   id: z.string().cuid(),
   merchantId: z.string(),
   bookingId: z.string().nullable(),

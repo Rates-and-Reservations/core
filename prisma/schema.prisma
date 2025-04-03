@@ -618,6 +618,8 @@ model BookingItem {
   startTime DateTime
   endTime   DateTime
 
+  currentStatus BookingItemStatus
+
   bookingRateSnapshotId String
   bookingRateSnapshot   BookingRateSnapshot @relation(fields: [bookingRateSnapshotId], references: [id])
 
@@ -665,7 +667,11 @@ model BookingItemTransition {
   bookingItemId String
   bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
 
-  status BookingStatus
+  fromStatus BookingItemStatus
+  toStatus   BookingItemStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -699,6 +705,8 @@ model Booking {
 
   startTime DateTime
   endTime   DateTime
+
+  currentStatus BookingStatus
 
   // Additional
   notes         String?
@@ -739,7 +747,11 @@ model BookingTransition {
   bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id])
 
-  status BookingStatus
+  fromStatus BookingStatus
+  toStatus   BookingStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -867,9 +879,11 @@ model WaitlistEntry {
   desiredStartTime DateTime?
   desiredEndTime   DateTime?
 
+  currentStatus WaitlistStatus
+
   notes String?
 
-  priority Int            @default(0) // Optional: manual sorting or ranking
+  priority Int @default(0) // Optional: manual sorting or ranking
 
   notifiedAt DateTime?
   promotedAt DateTime? // If they were converted into a booking
@@ -889,7 +903,11 @@ model WaitlistEntryTransition {
   waitlistEntryId String
   waitlistEntry   WaitlistEntry @relation(fields: [waitlistEntryId], references: [id])
 
-  status WaitlistStatus
+  fromStatus BookingItemStatus
+  toStatus   BookingItemStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -1201,7 +1219,6 @@ model Notification {
   subject   String?
   message   String
 
-  status       NotificationStatus @default(PENDING)
   errorMessage String?
 
   sentAt DateTime?

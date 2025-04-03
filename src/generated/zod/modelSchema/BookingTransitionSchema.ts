@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 import { BookingStatusSchema } from '../inputTypeSchemas/BookingStatusSchema'
 
 /////////////////////////////////////////
@@ -9,9 +10,13 @@ import { BookingStatusSchema } from '../inputTypeSchemas/BookingStatusSchema'
  * @group Booking
  */
 export const BookingTransitionSchema = z.object({
-  status: BookingStatusSchema,
+  fromStatus: BookingStatusSchema,
+  toStatus: BookingStatusSchema,
   id: z.string().cuid(),
   bookingId: z.string(),
+  reason: z.string().nullable(),
+  notes: z.string().nullable(),
+  metadata: JsonValueSchema.nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
