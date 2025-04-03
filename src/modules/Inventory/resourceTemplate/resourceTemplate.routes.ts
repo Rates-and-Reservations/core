@@ -9,5 +9,6 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
+router.post('/:id/clone', controller.clone);
 
 export default router;

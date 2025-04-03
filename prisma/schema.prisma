@@ -553,14 +553,16 @@ model BookingRequest {
 model BookingRequestActionValue {
   id               String         @id @default(cuid())
   bookingRequestId String
-  bookingActionId  String
-  bookingAction    BookingAction  @relation(fields: [bookingActionId], references: [id])
   bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id])
-  value            Json // Can be a resourceId, date range, array of add-ons, etc.
-  completedAt      DateTime       @default(now())
-  isDeleted        Boolean        @default(false)
-  deletedAt        DateTime?
-  createdAt        DateTime       @default(now())
+
+  bookingActionId String
+  bookingAction   BookingAction @relation(fields: [bookingActionId], references: [id])
+
+  value       Json // Can be a resourceId, date range, array of add-ons, etc.
+  completedAt DateTime  @default(now())
+  isDeleted   Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 enum BookingRequestStatus {

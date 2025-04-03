@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await BookingActionService.deleteBookingAction(req.params.id);
   res.json(result);
 };
+
+
+/** Priority order of booking actions */
+export const order = async (req: Request, res: Response) => {
+  // TODO: Implement order
+  res.json({ message: 'order not implemented' });
+};

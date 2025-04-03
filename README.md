@@ -83,8 +83,6 @@ Core API
 * Create rate
 * Modify rate
 * Delete rate
-* Add addon to rate
-* Remove addon from rate
 * Clone rate
 * Publish rate
 * Order rate
@@ -176,6 +174,24 @@ Core API
 * Install app
 * Uninstall app
 
+### Notifications
+
+#### Notification
+
+* List notifications
+* Get notification by id
+* Create notification
+* Trigger notification
+* Update notification
+
+#### Notification Templates
+
+* List notification templates
+* Create notification template
+* Get notification template
+* Update notification template
+* Delete notification template
+
 ### Booking Configuration
 
 #### Booking Template
@@ -186,7 +202,6 @@ Core API
 * Update booking template
 * Delete booking template
 * Clone booking template
-* order booking actions
 
 #### Booking Actions
 
@@ -194,6 +209,7 @@ Core API
 * Modify booking action
 * Update booking action
 * Remove booking action
+* order booking actions
 
 #### UI Template
 
@@ -213,6 +229,9 @@ Core API
 * Update booking request
 * Complete booking request
 * Cancel booking request
+
+#### Booking Request Action
+
 * Update booking request actions
 
 #### Booking Request Flow
@@ -306,21 +325,3 @@ Core API
 * Get refund request details
 * Issue refund
 * View refund logs
-
-### Booking Notifications
-
-#### Notification
-
-* List notifications
-* Get notification by id
-* Create notification
-* Trigger notification
-* Update notification
-
-#### Notification Templates
-
-* List notification templates
-* Create notification template
-* Get notification template
-* Update notification template
-* Delete notification template

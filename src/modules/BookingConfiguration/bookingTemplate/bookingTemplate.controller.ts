@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await BookingTemplateService.deleteBookingTemplate(req.params.id);
   res.json(result);
 };
+
+
+/** Clone a booking template */
+export const clone = async (req: Request, res: Response) => {
+  // TODO: Implement clone
+  res.json({ message: 'clone not implemented' });
+};

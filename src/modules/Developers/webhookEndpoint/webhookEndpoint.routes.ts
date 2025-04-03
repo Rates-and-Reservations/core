@@ -9,5 +9,8 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
+router.post('/:id/disable', controller.disable);
+router.post('/:id/enable', controller.enable);
+router.post('/:id/test', controller.test);
 
 export default router;

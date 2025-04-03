@@ -25,3 +25,34 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await ResourceService.deleteResource(req.params.id);
   res.json(result);
 };
+
+
+/** Disable a resource */
+export const disable = async (req: Request, res: Response) => {
+  // TODO: Implement disable
+  res.json({ message: 'disable not implemented' });
+};
+
+/** Enable a resource */
+export const enable = async (req: Request, res: Response) => {
+  // TODO: Implement enable
+  res.json({ message: 'enable not implemented' });
+};
+
+/** Clone a resource */
+export const clone = async (req: Request, res: Response) => {
+  // TODO: Implement clone
+  res.json({ message: 'clone not implemented' });
+};
+
+/** Check availability of a resource */
+export const checkAvailability = async (req: Request, res: Response) => {
+  // TODO: Implement checkAvailability
+  res.json({ message: 'checkAvailability not implemented' });
+};
+
+/** Get rate for a single resource */
+export const getResourceRates = async (req: Request, res: Response) => {
+  // TODO: Implement getResourceRates
+  res.json({ message: 'getResourceRates not implemented' });
+};

@@ -25,3 +25,22 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await DiscountService.deleteDiscount(req.params.id);
   res.json(result);
 };
+
+
+/** Disable a discount */
+export const disable = async (req: Request, res: Response) => {
+  // TODO: Implement disable
+  res.json({ message: 'disable not implemented' });
+};
+
+/** Enable a discount */
+export const enable = async (req: Request, res: Response) => {
+  // TODO: Implement enable
+  res.json({ message: 'enable not implemented' });
+};
+
+/** Lookup a discount code */
+export const lookup = async (req: Request, res: Response) => {
+  // TODO: Implement lookup
+  res.json({ message: 'lookup not implemented' });
+};

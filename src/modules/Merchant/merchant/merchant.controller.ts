@@ -27,8 +27,26 @@ export const deleteOne = async (req: Request, res: Response) => {
 };
 
 
-/** Disable a user */
+/** Disable a merchant */
 export const disable = async (req: Request, res: Response) => {
   // TODO: Implement disable
   res.json({ message: 'disable not implemented' });
+};
+
+/** Enable a merchant */
+export const enable = async (req: Request, res: Response) => {
+  // TODO: Implement enable
+  res.json({ message: 'enable not implemented' });
+};
+
+/** Verify a merchant */
+export const verify = async (req: Request, res: Response) => {
+  // TODO: Implement verify
+  res.json({ message: 'verify not implemented' });
+};
+
+/** Unverify a merchant */
+export const unverify = async (req: Request, res: Response) => {
+  // TODO: Implement unverify
+  res.json({ message: 'unverify not implemented' });
 };

@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await ResourceTemplateService.deleteResourceTemplate(req.params.id);
   res.json(result);
 };
+
+
+/** Clone a resource template */
+export const clone = async (req: Request, res: Response) => {
+  // TODO: Implement clone
+  res.json({ message: 'clone not implemented' });
+};

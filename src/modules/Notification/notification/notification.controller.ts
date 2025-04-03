@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await NotificationService.deleteNotification(req.params.id);
   res.json(result);
 };
+
+
+/** Trigger a notification */
+export const trigger = async (req: Request, res: Response) => {
+  // TODO: Implement trigger
+  res.json({ message: 'trigger not implemented' });
+};
