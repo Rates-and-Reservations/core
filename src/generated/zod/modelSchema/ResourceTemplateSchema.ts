@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // RESOURCE TEMPLATE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Inventory
+ */
 export const ResourceTemplateSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string().nullable(),

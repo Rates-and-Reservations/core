@@ -4,6 +4,9 @@ import { z } from 'zod';
 // WEBHOOK EVENT LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Developers
+ */
 export const WebhookEventLogSchema = z.object({
   id: z.string().cuid(),
   eventId: z.string(),

@@ -6,6 +6,9 @@ import { SelectionModeSchema } from '../inputTypeSchemas/SelectionModeSchema'
 // BOOKING TEMPLATE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group BookingConfiguration
+ */
 export const BookingTemplateSchema = z.object({
   selectionMode: SelectionModeSchema,
   id: z.string().cuid(),

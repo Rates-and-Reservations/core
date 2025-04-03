@@ -6,6 +6,9 @@ import { RefundStatusSchema } from '../inputTypeSchemas/RefundStatusSchema'
 // REFUND LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Payment
+ */
 export const RefundLogSchema = z.object({
   status: RefundStatusSchema,
   id: z.string().cuid(),

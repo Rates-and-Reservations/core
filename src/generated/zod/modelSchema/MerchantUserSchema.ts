@@ -5,6 +5,9 @@ import { OrganisationRolesSchema } from '../inputTypeSchemas/OrganisationRolesSc
 // MERCHANT USER SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Merchant
+ */
 export const MerchantUserSchema = z.object({
   role: OrganisationRolesSchema,
   id: z.string().cuid(),

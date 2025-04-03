@@ -6,6 +6,9 @@ import { DiscountTypeSchema } from '../inputTypeSchemas/DiscountTypeSchema'
 // DISCOUNT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Pricing
+ */
 export const DiscountSchema = z.object({
   discountType: DiscountTypeSchema,
   id: z.string().cuid(),

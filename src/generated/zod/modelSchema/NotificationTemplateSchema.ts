@@ -6,6 +6,9 @@ import { NotificationChannelSchema } from '../inputTypeSchemas/NotificationChann
 // NOTIFICATION TEMPLATE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Notification
+ */
 export const NotificationTemplateSchema = z.object({
   type: NotificationTypeSchema,
   channel: NotificationChannelSchema,

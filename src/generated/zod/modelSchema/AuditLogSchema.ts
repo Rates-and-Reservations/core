@@ -4,6 +4,9 @@ import { z } from 'zod';
 // AUDIT LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Events
+ */
 export const AuditLogSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

@@ -7,6 +7,9 @@ import { TaxTypeSchema } from '../inputTypeSchemas/TaxTypeSchema'
 // BOOKING RATE SNAPSHOT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Booking
+ */
 export const BookingRateSnapshotSchema = z.object({
   durationType: RateDurationTypeSchema,
   taxType: TaxTypeSchema,

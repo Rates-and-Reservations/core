@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // CUSTOMER SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Customer
+ */
 export const CustomerSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

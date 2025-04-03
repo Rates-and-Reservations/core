@@ -4,6 +4,9 @@ import { z } from 'zod';
 // RESOURCE ASSET SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Inventory
+ */
 export const ResourceAssetSchema = z.object({
   id: z.string().cuid(),
   resourceId: z.string(),

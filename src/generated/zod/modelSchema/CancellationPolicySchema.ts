@@ -7,6 +7,9 @@ import { CancellationScopeSchema } from '../inputTypeSchemas/CancellationScopeSc
 // CANCELLATION POLICY SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Booking
+ */
 export const CancellationPolicySchema = z.object({
   refundType: RefundTypeSchema,
   appliesTo: CancellationScopeSchema,

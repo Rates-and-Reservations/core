@@ -4,6 +4,9 @@ import { z } from 'zod';
 // RATE ADD ON SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Pricing
+ */
 export const RateAddOnSchema = z.object({
   id: z.string().cuid(),
   rateId: z.string(),

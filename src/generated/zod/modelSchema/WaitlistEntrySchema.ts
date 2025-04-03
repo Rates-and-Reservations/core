@@ -5,6 +5,9 @@ import { WaitlistStatusSchema } from '../inputTypeSchemas/WaitlistStatusSchema'
 // WAITLIST ENTRY SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Waitlist
+ */
 export const WaitlistEntrySchema = z.object({
   status: WaitlistStatusSchema,
   id: z.string().cuid(),

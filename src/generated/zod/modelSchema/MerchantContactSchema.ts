@@ -4,6 +4,9 @@ import { z } from 'zod';
 // MERCHANT CONTACT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Merchant
+ */
 export const MerchantContactSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

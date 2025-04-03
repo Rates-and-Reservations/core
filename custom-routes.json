@@ -192,5 +192,33 @@
       "path": "/:id/order",
       "description": "Priority order of booking actions"
     }
+  ],
+  "BookingRequest": [
+    {
+      "name": "cancel",
+      "method": "post",
+      "path": "/:id/cancel",
+      "description": "Cancel a booking request"
+    },
+    {
+      "name": "complete",
+      "method": "post",
+      "path": "/:id/complete",
+      "description": "Complete a booking request"
+    }
+  ],
+  "Booking": [
+    {
+      "name": "cancel",
+      "method": "post",
+      "path": "/:id/cancel",
+      "description": "Cancel a booking"
+    },
+    {
+      "name": "update-status",
+      "method": "post",
+      "path": "/:id/complete",
+      "description": "Complete a booking"
+    }
   ]
 }

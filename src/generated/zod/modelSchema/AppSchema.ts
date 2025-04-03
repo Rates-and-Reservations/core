@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // APP SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group App
+ */
 export const AppSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),

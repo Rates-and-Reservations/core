@@ -6,6 +6,9 @@ import { PaymentStatusSchema } from '../inputTypeSchemas/PaymentStatusSchema'
 // PAYMENT ACTIONS SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Payment
+ */
 export const PaymentActionsSchema = z.object({
   status: PaymentStatusSchema,
   id: z.string().cuid(),

@@ -7,6 +7,9 @@ import { TaxTypeSchema } from '../inputTypeSchemas/TaxTypeSchema'
 // RATE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Pricing
+ */
 export const RateSchema = z.object({
   durationType: RateDurationTypeSchema,
   taxType: TaxTypeSchema,

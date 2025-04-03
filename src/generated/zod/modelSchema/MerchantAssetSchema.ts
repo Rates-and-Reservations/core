@@ -4,6 +4,9 @@ import { z } from 'zod';
 // MERCHANT ASSET SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Merchant
+ */
 export const MerchantAssetSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

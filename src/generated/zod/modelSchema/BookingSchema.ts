@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
-import { BookingStatusSchema } from '../inputTypeSchemas/BookingStatusSchema'
 
 /////////////////////////////////////////
 // BOOKING SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Booking
+ */
 export const BookingSchema = z.object({
-  status: BookingStatusSchema,
   id: z.string().cuid(),
   merchantId: z.string(),
   customerId: z.string().nullable(),

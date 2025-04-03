@@ -5,6 +5,9 @@ import { Prisma } from '@prisma/client'
 // ADD ON SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Inventory
+ */
 export const AddOnSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

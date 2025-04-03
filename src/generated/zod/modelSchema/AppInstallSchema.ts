@@ -5,6 +5,9 @@ import { AppInstallStatusSchema } from '../inputTypeSchemas/AppInstallStatusSche
 // APP INSTALL SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group App
+ */
 export const AppInstallSchema = z.object({
   status: AppInstallStatusSchema,
   id: z.string().cuid(),

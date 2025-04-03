@@ -7,6 +7,9 @@ import { NotificationStatusSchema } from '../inputTypeSchemas/NotificationStatus
 // NOTIFICATION SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Notification
+ */
 export const NotificationSchema = z.object({
   type: NotificationTypeSchema,
   channel: NotificationChannelSchema,

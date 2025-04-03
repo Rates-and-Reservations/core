@@ -5,6 +5,9 @@ import { Prisma } from '@prisma/client'
 // INVOICE PAYMENT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Payment
+ */
 export const InvoicePaymentSchema = z.object({
   id: z.string().cuid(),
   invoiceId: z.string(),

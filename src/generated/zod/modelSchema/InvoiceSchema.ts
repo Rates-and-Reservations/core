@@ -6,6 +6,9 @@ import { InvoiceStatusSchema } from '../inputTypeSchemas/InvoiceStatusSchema'
 // INVOICE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Payment
+ */
 export const InvoiceSchema = z.object({
   status: InvoiceStatusSchema,
   id: z.string().cuid(),

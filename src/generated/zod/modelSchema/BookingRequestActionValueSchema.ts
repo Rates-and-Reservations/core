@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // BOOKING REQUEST ACTION VALUE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group BookingSetup
+ */
 export const BookingRequestActionValueSchema = z.object({
   id: z.string().cuid(),
   bookingRequestId: z.string(),

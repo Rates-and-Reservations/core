@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // WEBHOOK ENDPOINT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Developers
+ */
 export const WebhookEndpointSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

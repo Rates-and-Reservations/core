@@ -621,8 +621,6 @@ model BookingItem {
   bookingRateSnapshotId String
   bookingRateSnapshot   BookingRateSnapshot @relation(fields: [bookingRateSnapshotId], references: [id])
 
-  status BookingItemStatus @default(CONFIRMED) // Useful for partial success flows
-
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
@@ -632,6 +630,48 @@ model BookingItem {
   BookingItemAddOn BookingItemAddOn[]
 
   CancellationRequest CancellationRequest[]
+
+  BookingItemTransition BookingItemTransition[]
+}
+
+// BookingItemAddOn: Represents an add-on attached to a booking item
+/// @group Booking
+model BookingItemAddOn {
+  id String @id @default(cuid())
+
+  bookingItemId String
+  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
+
+  addOnId String
+  addOn   AddOn  @relation(fields: [addOnId], references: [id])
+
+  addOnName  String
+  unitPrice  Decimal
+  quantity   Int     @default(1)
+  totalPrice Decimal
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// BookingTransition: Represents a change in the status of a booking
+/// @group Booking
+model BookingItemTransition {
+  id String @id @default(cuid())
+
+  bookingItemId String
+  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
+
+  status BookingStatus
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum BookingItemStatus {
@@ -656,9 +696,6 @@ model Booking {
 
   bookingRequestId String?
   bookingRequest   BookingRequest? @relation(fields: [bookingRequestId], references: [id])
-
-  // Status
-  status BookingStatus @default(PENDING)
 
   startTime DateTime
   endTime   DateTime
@@ -690,23 +727,19 @@ model Booking {
   BookingAddOn BookingAddOn[]
 
   CancellationRequest CancellationRequest[]
+
+  BookingTransition BookingTransition[]
 }
 
-// BookingItemAddOn: Represents an add-on attached to a booking item
+// BookingTransition: Represents a change in the status of a booking
 /// @group Booking
-model BookingItemAddOn {
+model BookingTransition {
   id String @id @default(cuid())
 
-  bookingItemId String
-  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
-  addOnId String
-  addOn   AddOn  @relation(fields: [addOnId], references: [id])
-
-  addOnName  String
-  unitPrice  Decimal
-  quantity   Int     @default(1)
-  totalPrice Decimal
+  status BookingStatus
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?

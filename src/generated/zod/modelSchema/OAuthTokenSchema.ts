@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // O AUTH TOKEN SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group App
+ */
 export const OAuthTokenSchema = z.object({
   id: z.string().cuid(),
   appId: z.string(),

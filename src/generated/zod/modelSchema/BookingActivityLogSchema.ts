@@ -5,6 +5,9 @@ import { BookingActionTypeSchema } from '../inputTypeSchemas/BookingActionTypeSc
 // BOOKING ACTIVITY LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Events
+ */
 export const BookingActivityLogSchema = z.object({
   action: BookingActionTypeSchema,
   id: z.string().cuid(),

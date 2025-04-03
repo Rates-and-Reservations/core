@@ -4,6 +4,9 @@ import { z } from 'zod';
 // APP SCOPE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group App
+ */
 export const AppScopeSchema = z.object({
   id: z.string().cuid(),
   name: z.string(),

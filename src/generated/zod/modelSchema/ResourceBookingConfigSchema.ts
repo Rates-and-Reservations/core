@@ -5,6 +5,9 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 // RESOURCE BOOKING CONFIG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Inventory
+ */
 export const ResourceBookingConfigSchema = z.object({
   id: z.string().cuid(),
   resourceId: z.string(),

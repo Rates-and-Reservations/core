@@ -7,6 +7,9 @@ import { CancellationStatusSchema } from '../inputTypeSchemas/CancellationStatus
 // CANCELLATION REQUEST SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Booking
+ */
 export const CancellationRequestSchema = z.object({
   source: CancellationSourceSchema,
   status: CancellationStatusSchema,

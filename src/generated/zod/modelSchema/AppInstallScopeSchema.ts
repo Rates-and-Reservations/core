@@ -4,6 +4,9 @@ import { z } from 'zod';
 // APP INSTALL SCOPE SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group App
+ */
 export const AppInstallScopeSchema = z.object({
   id: z.string().cuid(),
   appInstallId: z.string(),

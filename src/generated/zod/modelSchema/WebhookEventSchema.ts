@@ -7,6 +7,9 @@ import { WebhookEventStatusSchema } from '../inputTypeSchemas/WebhookEventStatus
 // WEBHOOK EVENT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Developers
+ */
 export const WebhookEventSchema = z.object({
   eventType: WebhookEventTypeSchema,
   status: WebhookEventStatusSchema,

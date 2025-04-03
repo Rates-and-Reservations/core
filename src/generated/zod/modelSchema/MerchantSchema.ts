@@ -5,6 +5,9 @@ import { BusinessTypeSchema } from '../inputTypeSchemas/BusinessTypeSchema'
 // MERCHANT SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Merchant
+ */
 export const MerchantSchema = z.object({
   businessType: BusinessTypeSchema,
   id: z.string().cuid(),

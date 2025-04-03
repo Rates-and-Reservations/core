@@ -5,6 +5,9 @@ import { Prisma } from '@prisma/client'
 // BOOKING ITEM ADD ON SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Booking
+ */
 export const BookingItemAddOnSchema = z.object({
   id: z.string().cuid(),
   bookingItemId: z.string(),

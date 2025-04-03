@@ -4,6 +4,9 @@ import { z } from 'zod';
 // API USAGE LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Events
+ */
 export const ApiUsageLogSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),

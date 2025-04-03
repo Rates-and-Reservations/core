@@ -6,6 +6,9 @@ import { BookingRequestStatusSchema } from '../inputTypeSchemas/BookingRequestSt
 // BOOKING REQUEST SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group BookingSetup
+ */
 export const BookingRequestSchema = z.object({
   status: BookingRequestStatusSchema,
   id: z.string().cuid(),
