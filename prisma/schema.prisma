@@ -295,6 +295,7 @@ model AddOn {
   BookingAddOn BookingAddOn[]
 }
 
+// ResourceAsset: Represents an asset (image, file) associated with a resource
 /// @group Inventory
 model ResourceAsset {
   id String @id @default(cuid())
@@ -897,6 +898,8 @@ model WaitlistEntry {
   WaitlistEntryTransition WaitlistEntryTransition[]
 }
 
+// WaitlistEntryTransition: Represents a change in the status of a waitlist entry
+/// @group Waitlist
 model WaitlistEntryTransition {
   id String @id @default(cuid())
 
@@ -1163,7 +1166,8 @@ model CancellationRequest {
   reason      String?
   source      CancellationSource @default(CUSTOMER) // CUSTOMER | SYSTEM | SUPPORT
 
-  status      CancellationStatus @default(PENDING) // PENDING, APPROVED, DECLINED, CANCELLED
+  currentStatus CancellationStatus @default(PENDING)
+
   processedAt DateTime?
   approvedBy  String?
   approvedAt  DateTime?
@@ -1171,6 +1175,29 @@ model CancellationRequest {
 
   refundAmount Decimal?
   notes        String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CancellationRequestTransition CancellationRequestTransition[]
+}
+
+// CancellationRequestTransition: Represents a change in the status of a cancellation request
+/// @group Booking
+model CancellationRequestTransition {
+  id String @id @default(cuid())
+
+  cancellationRequestId String
+  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id])
+
+  fromStatus CancellationStatus
+  toStatus   CancellationStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -1232,6 +1259,8 @@ model Notification {
   NotificationLog NotificationLog[]
 }
 
+// NotificationLog: Represents a log entry for a notification message
+/// @group Notification
 model NotificationLog {
   id String @id @default(cuid())
 

@@ -12,7 +12,7 @@ import { CancellationStatusSchema } from '../inputTypeSchemas/CancellationStatus
  */
 export const CancellationRequestSchema = z.object({
   source: CancellationSourceSchema,
-  status: CancellationStatusSchema,
+  currentStatus: CancellationStatusSchema,
   id: z.string().cuid(),
   bookingId: z.string(),
   bookingItemId: z.string().nullable(),

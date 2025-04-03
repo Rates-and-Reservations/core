@@ -1,7 +1,3 @@
-import notificationLogRoutes from './notificationLog/notificationLog.routes';
-import waitlistEntryTransitionRoutes from './waitlistEntryTransition/waitlistEntryTransition.routes';
-import bookingTransitionRoutes from './Booking/bookingTransition/bookingTransition.routes';
-import bookingItemTransitionRoutes from './Booking/bookingItemTransition/bookingItemTransition.routes';
 import webhookEventLogRoutes from './Developers/webhookEventLog/webhookEventLog.routes';
 import webhookEventRoutes from './Developers/webhookEvent/webhookEvent.routes';
 import webhookEndpointRoutes from './Developers/webhookEndpoint/webhookEndpoint.routes';
@@ -16,7 +12,9 @@ import appScopeRoutes from './App/appScope/appScope.routes';
 import appInstallRoutes from './App/appInstall/appInstall.routes';
 import appRoutes from './App/app/app.routes';
 import notificationTemplateRoutes from './Notification/notificationTemplate/notificationTemplate.routes';
+import notificationLogRoutes from './Notification/notificationLog/notificationLog.routes';
 import notificationRoutes from './Notification/notification/notification.routes';
+import cancellationRequestTransitionRoutes from './Booking/cancellationRequestTransition/cancellationRequestTransition.routes';
 import cancellationRequestRoutes from './Booking/cancellationRequest/cancellationRequest.routes';
 import cancellationPolicyRoutes from './Booking/cancellationPolicy/cancellationPolicy.routes';
 import refundLogRoutes from './Payment/refundLog/refundLog.routes';
@@ -24,12 +22,15 @@ import refundRequestRoutes from './Payment/refundRequest/refundRequest.routes';
 import invoicePaymentRoutes from './Payment/invoicePayment/invoicePayment.routes';
 import invoiceRoutes from './Payment/invoice/invoice.routes';
 import paymentActionsRoutes from './Payment/paymentActions/paymentActions.routes';
+import waitlistEntryTransitionRoutes from './Waitlist/waitlistEntryTransition/waitlistEntryTransition.routes';
 import waitlistEntryRoutes from './Waitlist/waitlistEntry/waitlistEntry.routes';
 import customerRoutes from './Customer/customer/customer.routes';
 import bookingRateSnapshotRoutes from './Booking/bookingRateSnapshot/bookingRateSnapshot.routes';
 import bookingAddOnRoutes from './Booking/bookingAddOn/bookingAddOn.routes';
-import bookingItemAddOnRoutes from './Booking/bookingItemAddOn/bookingItemAddOn.routes';
+import bookingTransitionRoutes from './Booking/bookingTransition/bookingTransition.routes';
 import bookingRoutes from './Booking/booking/booking.routes';
+import bookingItemTransitionRoutes from './Booking/bookingItemTransition/bookingItemTransition.routes';
+import bookingItemAddOnRoutes from './Booking/bookingItemAddOn/bookingItemAddOn.routes';
 import bookingItemRoutes from './Booking/bookingItem/bookingItem.routes';
 import bookingRequestFlowRoutes from './BookingSetup/bookingRequestFlow/bookingRequestFlow.routes';
 import bookingRequestActionValueRoutes from './BookingSetup/bookingRequestActionValue/bookingRequestActionValue.routes';
@@ -90,9 +91,13 @@ router.use('/bookingRequestFlow', bookingRequestFlowRoutes);
 
 router.use('/bookingItem', bookingItemRoutes);
 
+router.use('/bookingItemAddOn', bookingItemAddOnRoutes);
+
+router.use('/bookingItemTransition', bookingItemTransitionRoutes);
+
 router.use('/booking', bookingRoutes);
 
-router.use('/bookingItemAddOn', bookingItemAddOnRoutes);
+router.use('/bookingTransition', bookingTransitionRoutes);
 
 router.use('/bookingAddOn', bookingAddOnRoutes);
 
@@ -101,6 +106,8 @@ router.use('/bookingRateSnapshot', bookingRateSnapshotRoutes);
 router.use('/customer', customerRoutes);
 
 router.use('/waitlistEntry', waitlistEntryRoutes);
+
+router.use('/waitlistEntryTransition', waitlistEntryTransitionRoutes);
 
 router.use('/paymentActions', paymentActionsRoutes);
 
@@ -116,7 +123,11 @@ router.use('/cancellationPolicy', cancellationPolicyRoutes);
 
 router.use('/cancellationRequest', cancellationRequestRoutes);
 
+router.use('/cancellationRequestTransition', cancellationRequestTransitionRoutes);
+
 router.use('/notification', notificationRoutes);
+
+router.use('/notificationLog', notificationLogRoutes);
 
 router.use('/notificationTemplate', notificationTemplateRoutes);
 
@@ -145,13 +156,5 @@ router.use('/webhookEndpoint', webhookEndpointRoutes);
 router.use('/webhookEvent', webhookEventRoutes);
 
 router.use('/webhookEventLog', webhookEventLogRoutes);
-
-router.use('/bookingItemTransition', bookingItemTransitionRoutes);
-
-router.use('/bookingTransition', bookingTransitionRoutes);
-
-router.use('/waitlistEntryTransition', waitlistEntryTransitionRoutes);
-
-router.use('/notificationLog', notificationLogRoutes);
 
 export default router;

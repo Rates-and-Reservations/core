@@ -5,6 +5,9 @@ import { NotificationStatusSchema } from '../inputTypeSchemas/NotificationStatus
 // NOTIFICATION LOG SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Notification
+ */
 export const NotificationLogSchema = z.object({
   status: NotificationStatusSchema,
   id: z.string().cuid(),

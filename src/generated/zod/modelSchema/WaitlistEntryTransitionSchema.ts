@@ -6,6 +6,9 @@ import { BookingItemStatusSchema } from '../inputTypeSchemas/BookingItemStatusSc
 // WAITLIST ENTRY TRANSITION SCHEMA
 /////////////////////////////////////////
 
+/**
+ * @group Waitlist
+ */
 export const WaitlistEntryTransitionSchema = z.object({
   fromStatus: BookingItemStatusSchema,
   toStatus: BookingItemStatusSchema,
