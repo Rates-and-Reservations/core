@@ -25,3 +25,10 @@ export const deleteOne = async (req: Request, res: Response) => {
   const result = await WaitlistEntryService.deleteWaitlistEntry(req.params.id);
   res.json(result);
 };
+
+
+/** Update the status of a waitlist entry */
+export const updateStatus = async (req: Request, res: Response) => {
+  // TODO: Implement updateStatus
+  res.json({ message: 'updateStatus not implemented' });
+};

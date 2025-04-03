@@ -869,11 +869,27 @@ model WaitlistEntry {
 
   notes String?
 
-  status   WaitlistStatus @default(ACTIVE)
   priority Int            @default(0) // Optional: manual sorting or ranking
 
   notifiedAt DateTime?
   promotedAt DateTime? // If they were converted into a booking
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  WaitlistEntryTransition WaitlistEntryTransition[]
+}
+
+model WaitlistEntryTransition {
+  id String @id @default(cuid())
+
+  waitlistEntryId String
+  waitlistEntry   WaitlistEntry @relation(fields: [waitlistEntryId], references: [id])
+
+  status WaitlistStatus
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -1189,6 +1205,25 @@ model Notification {
   errorMessage String?
 
   sentAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  NotificationLog NotificationLog[]
+}
+
+model NotificationLog {
+  id String @id @default(cuid())
+
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id])
+
+  status NotificationStatus
+
+  errorMessage String?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?

@@ -220,5 +220,27 @@
       "path": "/:id/status",
       "description": "Update the status of a booking"
     }
+  ],
+  "BookingItem": [
+    {
+      "name": "cancel",
+      "method": "post",
+      "path": "/:id/cancel",
+      "description": "Cancel a booking"
+    },
+    {
+      "name": "updateStatus",
+      "method": "post",
+      "path": "/:id/status",
+      "description": "Update the status of a booking"
+    }
+  ],
+  "WaitlistEntry": [
+    {
+      "name": "updateStatus",
+      "method": "post",
+      "path": "/:id/status",
+      "description": "Update the status of a waitlist entry"
+    }
   ]
 }

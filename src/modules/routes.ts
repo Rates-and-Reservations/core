@@ -1,3 +1,5 @@
+import notificationLogRoutes from './notificationLog/notificationLog.routes';
+import waitlistEntryTransitionRoutes from './waitlistEntryTransition/waitlistEntryTransition.routes';
 import bookingTransitionRoutes from './Booking/bookingTransition/bookingTransition.routes';
 import bookingItemTransitionRoutes from './Booking/bookingItemTransition/bookingItemTransition.routes';
 import webhookEventLogRoutes from './Developers/webhookEventLog/webhookEventLog.routes';
@@ -147,5 +149,9 @@ router.use('/webhookEventLog', webhookEventLogRoutes);
 router.use('/bookingItemTransition', bookingItemTransitionRoutes);
 
 router.use('/bookingTransition', bookingTransitionRoutes);
+
+router.use('/waitlistEntryTransition', waitlistEntryTransitionRoutes);
+
+router.use('/notificationLog', notificationLogRoutes);
 
 export default router;
