@@ -9,5 +9,6 @@ router.get('/:id', controller.getById);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.deleteOne);
 
+router.get('/:id/download', controller.download);
 
 export default router;
