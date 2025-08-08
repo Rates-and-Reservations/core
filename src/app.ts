@@ -10,7 +10,7 @@ import swaggerUi from 'swagger-ui-express';
 
 // Import middleware
 import { errorHandler } from '@/middleware/errorHandler';
-import { clerkAuthMiddleware } from '@/middleware/auth';
+import { clerkAuthMiddleware, authMiddleware } from '@/middleware/auth';
 import { validationErrorHandler } from '@/middleware/validation';
 import logger from '@/utils/logger';
 
@@ -21,6 +21,7 @@ import resourceRoutes from '@/routes/resources';
 import rateRoutes from '@/routes/rates';
 import customerRoutes from '@/routes/customers';
 import bookingRoutes from '@/routes/bookings';
+import paymentRoutes from '@/routes/payments';
 
 const app = express();
 
@@ -44,11 +45,11 @@ const corsOptions = {
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'stripe-signature'],
 };
 app.use(cors(corsOptions));
 
-// Rate limiting
+// Rate limiting (more lenient for payment webhooks)
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
@@ -57,8 +58,13 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for Stripe webhooks
+  skip: (req) => req.path === '/api/payments/webhook',
 });
 app.use('/api/', limiter);
+
+// Special handling for Stripe webhooks (need raw body)
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -81,7 +87,7 @@ const swaggerOptions = {
     info: {
       title: 'RatesSpot API',
       version: '1.0.0',
-      description: 'Headless Booking Engine API for RatesSpot',
+      description: 'Headless Booking Engine API for RatesSpot with Payment Processing',
       contact: {
         name: 'API Support',
         email: 'support@ratesspot.com',
@@ -101,11 +107,19 @@ const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
+          description: 'JWT token from Clerk authentication',
         },
         ApiKeyAuth: {
           type: 'apiKey',
           in: 'header',
           name: 'X-API-Key',
+          description: 'API key for programmatic access',
+        },
+        StripeWebhook: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'stripe-signature',
+          description: 'Stripe webhook signature for event verification',
         },
       },
     },
@@ -117,6 +131,36 @@ const swaggerOptions = {
         ApiKeyAuth: [],
       },
     ],
+    tags: [
+      {
+        name: 'Authentication',
+        description: 'User authentication and API key management',
+      },
+      {
+        name: 'Merchants',
+        description: 'Merchant account management',
+      },
+      {
+        name: 'Resources',
+        description: 'Resource and availability management',
+      },
+      {
+        name: 'Rates',
+        description: 'Pricing and add-on management',
+      },
+      {
+        name: 'Customers',
+        description: 'Customer management and preferences',
+      },
+      {
+        name: 'Bookings',
+        description: 'Booking lifecycle management',
+      },
+      {
+        name: 'Payments',
+        description: 'Payment processing and financial operations',
+      },
+    ],
   },
   apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // Path to the API files
 };
@@ -125,6 +169,15 @@ const specs = swaggerJsdoc(swaggerOptions);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'RatesSpot API Documentation',
+  customfavIcon: '/favicon.ico',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    docExpansion: 'none',
+    filter: true,
+    showExtensions: true,
+    tryItOutEnabled: true,
+  },
 }));
 
 // Health check endpoint
@@ -134,6 +187,11 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     environment: process.env.NODE_ENV || 'development',
+    services: {
+      database: 'connected', // You could add actual health checks here
+      stripe: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not configured',
+      clerk: process.env.CLERK_SECRET_KEY ? 'configured' : 'not configured',
+    },
   });
 });
 
@@ -144,6 +202,16 @@ app.use('/api/resources', clerkAuthMiddleware, resourceRoutes);
 app.use('/api/rates', clerkAuthMiddleware, rateRoutes);
 app.use('/api/customers', clerkAuthMiddleware, customerRoutes);
 app.use('/api/bookings', clerkAuthMiddleware, bookingRoutes);
+
+// Payment routes with flexible authentication (Clerk for most, webhook signature for webhooks)
+app.use('/api/payments', (req, res, next) => {
+  // Skip authentication for webhook endpoints (they use signature verification)
+  if (req.path === '/webhook') {
+    return next();
+  }
+  // Use normal authentication for all other payment endpoints
+  return authMiddleware(req, res, next);
+}, paymentRoutes);
 
 // Validation error handler (for Zod validation errors)
 app.use(validationErrorHandler);
@@ -165,6 +233,9 @@ app.use('*', (req, res) => {
       'GET /api/rates',
       'GET /api/customers',
       'GET /api/bookings',
+      'POST /api/payments/intent',
+      'POST /api/payments/webhook',
+      'GET /api/payments/analytics',
     ],
   });
 });

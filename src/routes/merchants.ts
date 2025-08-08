@@ -117,7 +117,7 @@ router.delete('/',
  * /api/merchants/contacts:
  *   post:
  *     summary: Create a new merchant contact
- *     tags: [Merchants]
+ *     tags: [Merchant Contacts]
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -159,7 +159,7 @@ router.post('/contacts',
  * /api/merchants/contacts:
  *   get:
  *     summary: Get merchant contacts
- *     tags: [Merchants]
+ *     tags: [Merchant Contacts]
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -173,7 +173,7 @@ router.get('/contacts', requireMerchantAccess, merchantController.getMerchantCon
  * /api/merchants/contacts/{id}:
  *   put:
  *     summary: Update a merchant contact
- *     tags: [Merchants]
+ *     tags: [Merchant Contacts]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -203,7 +203,7 @@ router.put('/contacts/:id',
  * /api/merchants/contacts/{id}:
  *   delete:
  *     summary: Delete a merchant contact
- *     tags: [Merchants]
+ *     tags: [Merchant Contacts]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -228,7 +228,7 @@ router.delete('/contacts/:id',
  * /api/merchants/users:
  *   post:
  *     summary: Invite a new user to the merchant
- *     tags: [Merchants]
+ *     tags: [Merchant Users]
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -266,7 +266,7 @@ router.post('/users',
  * /api/merchants/users:
  *   get:
  *     summary: Get all users in the merchant
- *     tags: [Merchants]
+ *     tags: [Merchant Users]
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -280,7 +280,7 @@ router.get('/users', requireMerchantAccess, merchantController.getMerchantUsers)
  * /api/merchants/users/{id}:
  *   put:
  *     summary: Update a merchant user
- *     tags: [Merchants]
+ *     tags: [Merchant Users]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -311,7 +311,7 @@ router.put('/users/:id',
  * /api/merchants/users/{id}:
  *   delete:
  *     summary: Remove a user from the merchant
- *     tags: [Merchants]
+ *     tags: [Merchant Users]
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -336,7 +336,7 @@ router.delete('/users/:id',
  * /api/merchants/assets:
  *   post:
  *     summary: Upload an asset for the merchant
- *     tags: [Merchants]
+ *     tags: [Merchant Assets]
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -354,7 +354,39 @@ router.delete('/users/:id',
  *         description: Asset uploaded successfully
  */
 router.post('/assets', requireMerchantAccess, merchantController.uploadMerchantAsset);
+
+/**
+ * @swagger
+ * /api/merchants/assets:
+ *   get:
+ *     summary: Get all assets for the merchant
+ *     tags: [Merchant Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Assets retrieved successfully
+ */
 router.get('/assets', requireMerchantAccess, merchantController.getMerchantAssets);
+
+/**
+ * @swagger
+ * /api/merchants/assets/{id}:
+ *   delete:
+ *     summary: Remove an asset from the merchant
+ *     tags: [Merchant Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Asset removed successfully
+ */
 router.delete('/assets/:id', 
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
