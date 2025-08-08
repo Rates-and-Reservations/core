@@ -27,7 +27,7 @@ const gracefulShutdown = (signal: string) => {
         logger.info('Database connections closed.');
         process.exit(0);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         logger.error('Error during database disconnect:', error);
         process.exit(1);
       });

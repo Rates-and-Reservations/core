@@ -1,26 +1,51 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2020",
+    "module": "commonjs",
     "lib": [
-      "es2021",
-      "dom"
+      "ES2020"
     ],
-    "module": "ESNext",
     "outDir": "./dist",
-    "strict": true,
-    "moduleResolution": "node",
-    "strictNullChecks": true,
-    "esModuleInterop": true,
+    "rootDir": "./src",
     "baseUrl": "./src",
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "typeRoots": ["./types", "./node_modules/@types"],
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types"
+    ],
     "paths": {
       "@/*": [
         "*"
       ],
-      "@zod/*": ["generated/zod/*"]
+      "@zod/*": [
+        "generated/zod/*"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist", "scripts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ],
+  "ts-node": {
+    "esm": false,
+    "files": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

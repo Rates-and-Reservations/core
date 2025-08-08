@@ -9,18 +9,18 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 // Import middleware
-import { errorHandler } from './middleware/errorHandler';
-import { clerkAuthMiddleware } from './middleware/auth';
-import { validationErrorHandler } from './middleware/validation';
-import logger from './utils/logger';
+import { errorHandler } from '@/middleware/errorHandler';
+import { clerkAuthMiddleware } from '@/middleware/auth';
+import { validationErrorHandler } from '@/middleware/validation';
+import logger from '@/utils/logger';
 
 // Import routes
-import authRoutes from './routes/auth';
-import merchantRoutes from './routes/merchants';
-// import resourceRoutes from './routes/resources';
-// import rateRoutes from './routes/rates';
-// import customerRoutes from './routes/customers';
-// import bookingRoutes from './routes/bookings';
+import authRoutes from '@/routes/auth';
+import merchantRoutes from '@/routes/merchants';
+// import resourceRoutes from '@/routes/resources';
+// import rateRoutes from '@/routes/rates';
+// import customerRoutes from '@/routes/customers';
+// import bookingRoutes from '@/routes/bookings';
 
 const app = express();
 

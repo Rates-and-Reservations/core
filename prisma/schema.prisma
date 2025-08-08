@@ -19,9 +19,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/**
- * PHASE 1: Core Models (MVP - Essential for basic booking functionality)
- */
+// PHASE 1: Core Models (MVP - Essential for basic booking functionality)
 
 /// Merchant: The main entity representing a business or organisation
 /// @group Merchant
@@ -189,9 +187,7 @@ enum OrganisationRoles {
   DEVELOPER
 }
 
-/**
- * Localization & Currency Support
- */
+// Localization & Currency Support
 
 /// Currency: Supported currencies for multi-currency support
 /// @group Localization
@@ -241,9 +237,7 @@ model ServiceLocation {
   @@index([latitude, longitude])
 }
 
-/**
- * PHASE 1: Core Resource Models
- */
+// PHASE 1: Core Resource Models 
 
 /// Resource: Represents a physical or virtual resource that can be booked
 /// @group Inventory
@@ -484,9 +478,7 @@ enum TaxType {
   FIXED
 }
 
-/**
- * Advanced Pricing Models
- */
+// Advanced Pricing Model 
 
 /// PricingRule: Dynamic pricing rules based on demand, time, etc.
 /// @group Pricing
@@ -524,9 +516,7 @@ enum PricingRuleType {
   LOYALTY // Loyal customer discounts
 }
 
-/**
- * PHASE 1: Core Booking Models
- */
+// PHASE 1: Core Booking Models 
 
 /// Customer: Represents a customer who makes bookings
 /// @group Customer
@@ -733,9 +723,7 @@ model BookingRateSnapshot {
   @@index([rateId])
 }
 
-/**
- * Real-time Events & Notifications
- */
+// Real-time Events & Notifications 
 
 /// EventSubscription: Subscriptions for real-time updates
 /// @group Events
@@ -775,9 +763,7 @@ model SystemEvent {
   @@index([createdAt])
 }
 
-/**
- * Integration & External Systems
- */
+// Integration & External Systems 
 
 /// Integration: External system integrations
 /// @group Integration
@@ -822,9 +808,7 @@ enum IntegrationType {
   CUSTOM_WEBHOOK
 }
 
-/**
- * Data Import/Export
- */
+// Data Import/Export 
 
 /// ImportJob: Track data import operations
 /// @group Import
@@ -868,9 +852,7 @@ enum JobStatus {
   CANCELLED
 }
 
-/**
- * PHASE 1: Payment Models
- */
+// PHASE 1: Payment Models 
 
 /// PaymentActions: Represents a payment transaction for a booking
 /// @group Payment
@@ -917,9 +899,7 @@ enum PaymentStatus {
   PARTIALLY_REFUNDED
 }
 
-/**
- * PHASE 1: API and Developer Models
- */
+// PHASE 1: API and Developer Models 
 
 /// ApiKey: Represents an API key for merchant API access
 /// @group Developers
@@ -951,9 +931,7 @@ model ApiKey {
   @@index([lastUsedAt])
 }
 
-/**
- * PHASE 1: Notification Models
- */
+// PHASE 1: Notification Models 
 
 /// Notification: Represents a notification message sent to a customer or merchant
 /// @group Notification
@@ -1021,9 +999,7 @@ enum NotificationStatus {
   OPENED
 }
 
-/**
- * PHASE 2: Advanced Booking Models (Add after MVP is working)
- */
+// PHASE 2: Advanced Booking Models (Add after MVP is working) 
 
 /// ResourceTemplate: Represents a template for a resource type
 /// @group Inventory
@@ -1716,9 +1692,7 @@ enum WaitlistStatus {
   EXPIRED
 }
 
-/**
- * PHASE 2: Payment and Invoicing Models
- */
+// PHASE 2: Payment and Invoicing Models 
 
 /// Invoice: Represents an invoice for a booking or payment
 /// @group Payment
@@ -1929,9 +1903,7 @@ enum RefundStatus {
   FAILED
 }
 
-/**
- * PHASE 2: Advanced Notification Models
- */
+// PHASE 2: Advanced Notification Models
 
 /// NotificationTemplate: Represents a template for a notification message
 /// @group Notification
@@ -1985,9 +1957,7 @@ model NotificationLog {
   @@index([status])
 }
 
-/**
- * PHASE 2: Analytics and Logging Models
- */
+// PHASE 2: Analytics and Logging Models 
 
 /// ApiUsageLog: Represents a log entry for API usage
 /// @group Events
@@ -2128,9 +2098,7 @@ model AuditLog {
   @@index([action])
 }
 
-/**
- * PHASE 2: Webhook Models
- */
+// PHASE 2: Webhook Models 
 
 /// WebhookEndpoint: Represents a webhook URL for event notifications
 /// @group Developers
@@ -2237,9 +2205,7 @@ model WebhookEventLog {
   @@index([responseCode])
 }
 
-/**
- * PHASE 3: App Marketplace Models (Advanced Integration Features)
- */
+// PHASE 3: App Marketplace Models (Advanced Integration Features) 
 
 /// App: Represents a third-party app or integration
 /// @group App
@@ -2401,9 +2367,7 @@ model OAuthToken {
   @@index([isRevoked])
 }
 
-/**
- * Advanced Search & Analytics Models
- */
+// Advanced Search & Analytics Models 
 
 /// SavedSearch: Represents saved search queries
 /// @group Search
@@ -2474,9 +2438,7 @@ model ReportExecution {
   @@index([createdAt])
 }
 
-/**
- * Security & Compliance Models
- */
+// Security & Compliance Models 
 
 /// SecurityLog: Security-related events
 /// @group Security
@@ -2522,53 +2484,51 @@ model DataRetentionPolicy {
   @@index([nextRunAt, isActive])
 }
 
-/**
- * Additional relationships for enhanced models
- */
+// ----------------------------------------
+// Additional relationships for enhanced models
+// ----------------------------------------
 
-/**
- * Views for Analytics (PostgreSQL Views)
- */
+// Views for Analytics (PostgreSQL Views)
 
 // Note: These would be created as database views, not Prisma models
 // Including here for reference of what analytics data would be available
 
-/**
- * VIEW booking_summary AS
- * SELECT
- * merchantId,
- * DATE(createdAt) as booking_date,
- * COUNT(*) as total_bookings,
- * COUNT(CASE WHEN currentStatus = 'CONFIRMED' THEN 1 END) as confirmed_bookings,
- * COUNT(CASE WHEN currentStatus = 'CANCELLED' THEN 1 END) as cancelled_bookings,
- * SUM(totalPrice) as total_revenue,
- * AVG(totalPrice) as average_booking_value
- * FROM "Booking"
- * GROUP BY merchantId, DATE(createdAt);
- * VIEW resource_utilization AS
- * SELECT
- * r.merchantId,
- * r.id as resourceId,
- * r.name as resourceName,
- * r.capacity,
- * COUNT(b.id) as total_bookings,
- * SUM(b.partySize) as total_guests,
- * (SUM(b.partySize) * 100.0 / (r.capacity * COUNT(DISTINCT DATE(b.startTime)))) as utilization_rate
- * FROM "Resource" r
- * LEFT JOIN "Booking" b ON r.id = b.resourceId AND b.currentStatus = 'CONFIRMED'
- * GROUP BY r.merchantId, r.id, r.name, r.capacity;
- * VIEW customer_lifetime_value AS
- * SELECT
- * c.merchantId,
- * c.id as customerId,
- * c.name,
- * c.email,
- * COUNT(b.id) as total_bookings,
- * SUM(b.totalPrice) as lifetime_value,
- * AVG(b.totalPrice) as average_booking_value,
- * MIN(b.createdAt) as first_booking,
- * MAX(b.createdAt) as last_booking
- * FROM "Customer" c
- * LEFT JOIN "Booking" b ON c.id = b.customerId
- * GROUP BY c.merchantId, c.id, c.name, c.email;
- */
+// VIEW booking_summary AS
+// SELECT
+//   merchantId,
+//   DATE(createdAt) as booking_date,
+//   COUNT(*) as total_bookings,
+//   COUNT(CASE WHEN currentStatus = 'CONFIRMED' THEN 1 END) as confirmed_bookings,
+//   COUNT(CASE WHEN currentStatus = 'CANCELLED' THEN 1 END) as cancelled_bookings,
+//   SUM(totalPrice) as total_revenue,
+//   AVG(totalPrice) as average_booking_value
+// FROM "Booking"
+// GROUP BY merchantId, DATE(createdAt);
+
+// VIEW resource_utilization AS
+// SELECT
+//   r.merchantId,
+//   r.id as resourceId,
+//   r.name as resourceName,
+//   r.capacity,
+//   COUNT(b.id) as total_bookings,
+//   SUM(b.partySize) as total_guests,
+//   (SUM(b.partySize) * 100.0 / (r.capacity * COUNT(DISTINCT DATE(b.startTime)))) as utilization_rate
+// FROM "Resource" r
+// LEFT JOIN "Booking" b ON r.id = b.resourceId AND b.currentStatus = 'CONFIRMED'
+// GROUP BY r.merchantId, r.id, r.name, r.capacity;
+
+// VIEW customer_lifetime_value AS
+// SELECT
+//   c.merchantId,
+//   c.id as customerId,
+//   c.name,
+//   c.email,
+//   COUNT(b.id) as total_bookings,
+//   SUM(b.totalPrice) as lifetime_value,
+//   AVG(b.totalPrice) as average_booking_value,
+//   MIN(b.createdAt) as first_booking,
+//   MAX(b.createdAt) as last_booking
+// FROM "Customer" c
+// LEFT JOIN "Booking" b ON c.id = b.customerId
+// GROUP BY c.merchantId, c.id, c.name, c.email;
