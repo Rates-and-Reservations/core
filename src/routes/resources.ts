@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { validateRequest } from '@/middleware/validation';
 import { requireRole, requireMerchantAccess } from '@/middleware/auth';
 import * as resourceController from '@/controllers/resourceController';
-import { 
-  createResourceSchema, 
+import {
+  createResourceSchema,
   updateResourceSchema,
   createAvailabilityBlockSchema,
   updateAvailabilityBlockSchema,
@@ -52,10 +52,10 @@ const router = Router();
  *       201:
  *         description: Resource created successfully
  */
-router.post('/', 
+router.post('/',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
-  validateRequest({ body: createResourceSchema }), 
+  validateRequest({ body: createResourceSchema }),
   resourceController.createResource
 );
 
@@ -90,7 +90,7 @@ router.post('/',
  *       200:
  *         description: Resources retrieved successfully
  */
-router.get('/', 
+router.get('/',
   requireMerchantAccess,
   validateRequest({ query: resourceQuerySchema }),
   resourceController.getResources
@@ -134,10 +134,10 @@ router.get('/:id', requireMerchantAccess, resourceController.getResource);
  *       200:
  *         description: Resource updated successfully
  */
-router.put('/:id', 
+router.put('/:id',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
-  validateRequest({ body: updateResourceSchema }), 
+  validateRequest({ body: updateResourceSchema }),
   resourceController.updateResource
 );
 
@@ -159,7 +159,7 @@ router.put('/:id',
  *       200:
  *         description: Resource deleted successfully
  */
-router.delete('/:id', 
+router.delete('/:id',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.deleteResource
@@ -199,90 +199,538 @@ router.delete('/:id',
 router.get('/:id/availability', requireMerchantAccess, resourceController.getResourceAvailability);
 
 // Availability Blocks
-router.post('/:id/availability-blocks', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-blocks:
+ *   post:
+ *     summary: Create an availability block for a resource
+ *     tags: [Availability Blocks]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - startTime
+ *               - endTime
+ *             properties:
+ *               startTime:
+ *                 type: string
+ *                 format: date-time
+ *               endTime:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       201:
+ *         description: Availability block created successfully
+ */
+router.post('/:id/availability-blocks',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: createAvailabilityBlockSchema }),
   resourceController.createAvailabilityBlock
 );
 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-blocks:
+ *   get:
+ *     summary: Get availability blocks for a resource
+ *     tags: [Availability Blocks]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Availability blocks retrieved successfully
+ */
 router.get('/:id/availability-blocks', requireMerchantAccess, resourceController.getAvailabilityBlocks);
 
-router.put('/:id/availability-blocks/:blockId', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-blocks/{blockId}:
+ *   put:
+ *     summary: Update an availability block for a resource
+ *     tags: [Availability Blocks]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: blockId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - startTime
+ *               - endTime
+ *             properties:
+ *               startTime:
+ *                 type: string
+ *                 format: date-time
+ *               endTime:
+ *                 type: string
+ *                 format: date-time
+ *     responses:
+ *       200:
+ *         description: Availability block updated successfully
+ */
+router.put('/:id/availability-blocks/:blockId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: updateAvailabilityBlockSchema }),
   resourceController.updateAvailabilityBlock
 );
 
-router.delete('/:id/availability-blocks/:blockId', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-blocks/{blockId}:
+ *   delete:
+ *     summary: Delete an availability block for a resource
+ *     tags: [Availability Blocks]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: blockId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Availability block deleted successfully
+ */
+router.delete('/:id/availability-blocks/:blockId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.deleteAvailabilityBlock
 );
 
 // Availability Rules
-router.post('/:id/availability-rules', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-rules:
+ *   post:
+ *     summary: Create an availability rule for a resource
+ *     tags: [Availability Rules]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - dayOfWeek
+ *               - startTime
+ *               - endTime
+ *             properties:
+ *               dayOfWeek:
+ *                 type: string
+ *                 enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+ *               startTime:
+ *                 type: string
+ *                 format: time
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *     responses:
+ *       201:
+ *         description: Availability rule created successfully 
+ */
+router.post('/:id/availability-rules',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: createAvailabilityRuleSchema }),
   resourceController.createAvailabilityRule
 );
 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-rules:
+ *   get:
+ *     summary: Get availability rules for a resource
+ *     tags: [Availability Rules]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Availability rules retrieved successfully
+ */
 router.get('/:id/availability-rules', requireMerchantAccess, resourceController.getAvailabilityRules);
 
-router.put('/:id/availability-rules/:ruleId', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-rules/{ruleId}:
+ *   put:
+ *     summary: Update an availability rule for a resource
+ *     tags: [Availability Rules]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - dayOfWeek
+ *               - startTime
+ *               - endTime
+ *             properties:
+ *               dayOfWeek:
+ *                 type: string
+ *                 enum: [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+ *               startTime:
+ *                 type: string
+ *                 format: time
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *    responses:
+ *      200:
+ *        description: Availability rule updated successfully
+ */
+router.put('/:id/availability-rules/:ruleId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: updateAvailabilityRuleSchema }),
   resourceController.updateAvailabilityRule
 );
 
-router.delete('/:id/availability-rules/:ruleId', 
+/**
+ * @swagger
+ * /api/resources/{id}/availability-rules/{ruleId}:
+ *   delete:
+ *     summary: Delete an availability rule for a resource
+ *     tags: [Availability Rules]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Availability rule deleted successfully
+ */
+router.delete('/:id/availability-rules/:ruleId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.deleteAvailabilityRule
 );
 
 // Booking Constraints
-router.post('/:id/constraints', 
+/**
+ * @swagger
+ * /api/resources/{id}/constraints:
+ *   post:
+ *     summary: Create a booking constraint for a resource
+ *     tags: [Booking Constraints]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - key
+ *               - value
+ *             properties:
+ *               key:
+ *                type: string
+ *               value:
+ *                type: string
+ *     responses:
+ *       201:
+ *         description: Booking constraint created successfully
+ */
+router.post('/:id/constraints',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: createBookingConstraintSchema }),
   resourceController.createBookingConstraint
 );
 
+/**
+ * @swagger
+ * /api/resources/{id}/constraints:
+ *   get:
+ *     summary: Get booking constraints for a resource
+ *     tags: [Booking Constraints]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Booking constraints retrieved successfully
+ */
 router.get('/:id/constraints', requireMerchantAccess, resourceController.getBookingConstraints);
 
-router.put('/:id/constraints/:constraintId', 
+/**
+ * @swagger
+ * /api/resources/{id}/constraints/{constraintId}:
+ *   put:
+ *     summary: Update a booking constraint for a resource
+ *     tags: [Booking Constraints]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: constraintId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - key
+ *               - value
+ *             properties:
+ *               key:
+ *                 type: string
+ *               value:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Booking constraint updated successfully
+ */
+router.put('/:id/constraints/:constraintId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   validateRequest({ body: updateBookingConstraintSchema }),
   resourceController.updateBookingConstraint
 );
 
-router.delete('/:id/constraints/:constraintId', 
+/**
+ * @swagger
+ * /api/resources/{id}/constraints/{constraintId}:
+ *   delete:
+ *     summary: Delete a booking constraint for a resource
+ *     tags: [Booking Constraints]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: constraintId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Booking constraint deleted successfully
+ */
+router.delete('/:id/constraints/:constraintId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.deleteBookingConstraint
 );
 
 // Resource Assets
-router.post('/:id/assets', 
+/**
+ * @swagger
+ * /api/resources/{id}/assets:
+ *   post:
+ *     summary: Upload an asset for a resource
+ *     tags: [Resource Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *    responses:
+ *      201:
+ *        description: Asset uploaded successfully
+ */
+router.post('/:id/assets',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.uploadResourceAsset
 );
 
+/**
+ * @swagger
+ * /api/resources/{id}/assets:
+ *   get:
+ *     summary: Get assets for a resource
+ *     tags: [Resource Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Assets retrieved successfully
+ */
 router.get('/:id/assets', requireMerchantAccess, resourceController.getResourceAssets);
 
-router.put('/:id/assets/:assetId', 
+/**
+ * @swagger
+ * /api/resources/{id}/assets/{assetId}:
+ *   put:
+ *     summary: Update an asset for a resource
+ *     tags: [Resource Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: assetId
+ *         required: true
+ *         schema:
+ *           type: string
+ * requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Asset updated successfully
+ */
+router.put('/:id/assets/:assetId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.updateResourceAsset
 );
 
-router.delete('/:id/assets/:assetId', 
+/**
+ * @swagger
+ * /api/resources/{id}/assets/{assetId}:
+ *   delete:
+ *     summary: Delete an asset for a resource
+ *     tags: [Resource Assets]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: assetId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Asset deleted successfully
+ */
+router.delete('/:id/assets/:assetId',
   requireMerchantAccess,
   requireRole(['OWNER', 'ADMIN']),
   resourceController.deleteResourceAsset

@@ -19,8 +19,8 @@ import authRoutes from '@/routes/auth';
 import merchantRoutes from '@/routes/merchants';
 import resourceRoutes from '@/routes/resources';
 import rateRoutes from '@/routes/rates';
-// import customerRoutes from '@/routes/customers';
-// import bookingRoutes from '@/routes/bookings';
+import customerRoutes from '@/routes/customers';
+import bookingRoutes from '@/routes/bookings';
 
 const app = express();
 
@@ -142,8 +142,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/merchants', clerkAuthMiddleware, merchantRoutes);
 app.use('/api/resources', clerkAuthMiddleware, resourceRoutes);
 app.use('/api/rates', clerkAuthMiddleware, rateRoutes);
-// app.use('/api/customers', clerkAuthMiddleware, customerRoutes);
-// app.use('/api/bookings', clerkAuthMiddleware, bookingRoutes);
+app.use('/api/customers', clerkAuthMiddleware, customerRoutes);
+app.use('/api/bookings', clerkAuthMiddleware, bookingRoutes);
 
 // Validation error handler (for Zod validation errors)
 app.use(validationErrorHandler);
@@ -162,6 +162,9 @@ app.use('*', (req, res) => {
       'POST /api/auth/login',
       'GET /api/merchants',
       'GET /api/resources',
+      'GET /api/rates',
+      'GET /api/customers',
+      'GET /api/bookings',
     ],
   });
 });
