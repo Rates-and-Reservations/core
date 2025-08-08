@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const NotificationChannelSchema = z.enum(['EMAIL','SMS']);
+export const NotificationChannelSchema = z.enum(['EMAIL','SMS','PUSH','IN_APP']);
 
 export type NotificationChannelType = `${z.infer<typeof NotificationChannelSchema>}`
 

@@ -7,6 +7,7 @@ import { RefundStatusSchema } from '../inputTypeSchemas/RefundStatusSchema'
 /////////////////////////////////////////
 
 /**
+ * RefundLog: Represents a log entry for a refund transaction
  * @group Payment
  */
 export const RefundLogSchema = z.object({

@@ -8,6 +8,7 @@ import { WebhookEventStatusSchema } from '../inputTypeSchemas/WebhookEventStatus
 /////////////////////////////////////////
 
 /**
+ * WebhookEvent: Represents an event to be sent to a webhook endpoint
  * @group Developers
  */
 export const WebhookEventSchema = z.object({
@@ -21,6 +22,7 @@ export const WebhookEventSchema = z.object({
   responseBody: z.string().nullable(),
   errorMessage: z.string().nullable(),
   retryCount: z.number().int(),
+  maxRetries: z.number().int(),
   nextRetryAt: z.coerce.date().nullable(),
   sentAt: z.coerce.date().nullable(),
   isDeleted: z.boolean(),

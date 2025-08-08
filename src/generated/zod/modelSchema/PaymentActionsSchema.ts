@@ -7,6 +7,7 @@ import { PaymentStatusSchema } from '../inputTypeSchemas/PaymentStatusSchema'
 /////////////////////////////////////////
 
 /**
+ * PaymentActions: Represents a payment transaction for a booking
  * @group Payment
  */
 export const PaymentActionsSchema = z.object({

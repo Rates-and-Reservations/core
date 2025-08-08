@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingRequestFlow: Represents a flow that can be shared for booking
  * @group BookingSetup
  */
 export const BookingRequestFlowSchema = z.object({

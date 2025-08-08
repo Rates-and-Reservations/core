@@ -8,6 +8,7 @@ import { CancellationStatusSchema } from '../inputTypeSchemas/CancellationStatus
 /////////////////////////////////////////
 
 /**
+ * CancellationRequest: Represents a request to cancel a booking
  * @group Booking
  */
 export const CancellationRequestSchema = z.object({

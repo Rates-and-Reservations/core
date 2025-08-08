@@ -7,6 +7,7 @@ import { BookingRequestStatusSchema } from '../inputTypeSchemas/BookingRequestSt
 /////////////////////////////////////////
 
 /**
+ * BookingRequest: Represents a booking request made by a customer
  * @group BookingSetup
  */
 export const BookingRequestSchema = z.object({

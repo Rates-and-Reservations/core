@@ -6,6 +6,7 @@ import { WaitlistStatusSchema } from '../inputTypeSchemas/WaitlistStatusSchema'
 /////////////////////////////////////////
 
 /**
+ * WaitlistEntry: Represents a customer waiting for a resource
  * @group Waitlist
  */
 export const WaitlistEntrySchema = z.object({
@@ -16,6 +17,7 @@ export const WaitlistEntrySchema = z.object({
   customerId: z.string().nullable(),
   desiredStartTime: z.coerce.date().nullable(),
   desiredEndTime: z.coerce.date().nullable(),
+  partySize: z.number().int(),
   notes: z.string().nullable(),
   priority: z.number().int(),
   notifiedAt: z.coerce.date().nullable(),

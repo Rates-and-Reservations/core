@@ -8,6 +8,7 @@ import { TaxTypeSchema } from '../inputTypeSchemas/TaxTypeSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingRateSnapshot: Represents a snapshot of a rate at booking time
  * @group Booking
  */
 export const BookingRateSnapshotSchema = z.object({
@@ -21,10 +22,8 @@ export const BookingRateSnapshotSchema = z.object({
   currency: z.string(),
   isDefault: z.boolean(),
   isActive: z.boolean(),
-  bookingStartDate: z.coerce.date().nullable(),
-  bookingEndDate: z.coerce.date().nullable(),
-  usageStartDate: z.coerce.date().nullable(),
-  usageEndDate: z.coerce.date().nullable(),
+  validFrom: z.coerce.date().nullable(),
+  validTo: z.coerce.date().nullable(),
   taxAmount: z.instanceof(Prisma.Decimal, { message: "Field 'taxAmount' must be a Decimal. Location: ['Models', 'BookingRateSnapshot']"}),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),

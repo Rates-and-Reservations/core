@@ -6,6 +6,7 @@ import { BookingItemStatusSchema } from '../inputTypeSchemas/BookingItemStatusSc
 /////////////////////////////////////////
 
 /**
+ * BookingItem: Represents a single item in a booking
  * @group Booking
  */
 export const BookingItemSchema = z.object({

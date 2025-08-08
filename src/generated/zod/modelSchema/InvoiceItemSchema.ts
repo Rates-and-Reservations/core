@@ -6,12 +6,15 @@ import { Prisma } from '@prisma/client'
 /////////////////////////////////////////
 
 /**
+ * InvoiceItem: Represents an item in an invoice
  * @group Payment
  */
 export const InvoiceItemSchema = z.object({
   id: z.string().cuid(),
   invoiceId: z.string(),
   description: z.string(),
+  quantity: z.number().int(),
+  unitPrice: z.instanceof(Prisma.Decimal, { message: "Field 'unitPrice' must be a Decimal. Location: ['Models', 'InvoiceItem']"}),
   amount: z.instanceof(Prisma.Decimal, { message: "Field 'amount' must be a Decimal. Location: ['Models', 'InvoiceItem']"}),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),

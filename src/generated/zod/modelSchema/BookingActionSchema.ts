@@ -7,6 +7,7 @@ import { ActionTypeSchema } from '../inputTypeSchemas/ActionTypeSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingAction: Represents a step or action in a booking flow
  * @group BookingConfiguration
  */
 export const BookingActionSchema = z.object({
@@ -16,6 +17,7 @@ export const BookingActionSchema = z.object({
   name: z.string(),
   config: JsonValueSchema,
   required: z.boolean(),
+  order: z.number().int(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

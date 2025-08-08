@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * MerchantAsset: Represents a file or asset uploaded by the merchant
  * @group Merchant
  */
 export const MerchantAssetSchema = z.object({

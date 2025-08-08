@@ -6,18 +6,17 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * ResourceBookingConfig: Represents the booking configuration for a resource
  * @group Inventory
  */
 export const ResourceBookingConfigSchema = z.object({
   id: z.string().cuid(),
   resourceId: z.string(),
-  minDuration: z.number().int(),
-  maxDuration: z.number().int(),
-  bufferTime: z.number().int(),
   availableDays: JsonValueSchema.nullable(),
   blackoutDates: JsonValueSchema.nullable(),
   allowMultipleBookings: z.boolean(),
   enableWaitlist: z.boolean(),
+  autoConfirm: z.boolean(),
   cancellationPolicyId: z.string().nullable(),
   isActive: z.boolean(),
   isDeleted: z.boolean(),

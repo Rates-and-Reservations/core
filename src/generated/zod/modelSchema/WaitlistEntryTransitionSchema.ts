@@ -1,17 +1,18 @@
 import { z } from 'zod';
 import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
-import { BookingItemStatusSchema } from '../inputTypeSchemas/BookingItemStatusSchema'
+import { WaitlistStatusSchema } from '../inputTypeSchemas/WaitlistStatusSchema'
 
 /////////////////////////////////////////
 // WAITLIST ENTRY TRANSITION SCHEMA
 /////////////////////////////////////////
 
 /**
+ * WaitlistEntryTransition: Represents a change in the status of a waitlist entry
  * @group Waitlist
  */
 export const WaitlistEntryTransitionSchema = z.object({
-  fromStatus: BookingItemStatusSchema,
-  toStatus: BookingItemStatusSchema,
+  fromStatus: WaitlistStatusSchema,
+  toStatus: WaitlistStatusSchema,
   id: z.string().cuid(),
   waitlistEntryId: z.string(),
   reason: z.string().nullable(),

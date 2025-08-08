@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * AuditLog: Represents a log entry for merchant activity
  * @group Events
  */
 export const AuditLogSchema = z.object({
@@ -17,7 +18,7 @@ export const AuditLogSchema = z.object({
   description: z.string().nullable(),
   ipAddress: z.string().nullable(),
   userAgent: z.string().nullable(),
-  performedAt: z.coerce.date().nullable(),
+  performedAt: z.coerce.date(),
   performedBy: z.string().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),

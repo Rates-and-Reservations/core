@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const InvoiceStatusSchema = z.enum(['PENDING','PAID','OVERDUE','CANCELLED']);
+export const InvoiceStatusSchema = z.enum(['PENDING','SENT','PAID','OVERDUE','CANCELLED','REFUNDED']);
 
 export type InvoiceStatusType = `${z.infer<typeof InvoiceStatusSchema>}`
 

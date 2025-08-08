@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * MerchantContact: Contact details for the merchant
  * @group Merchant
  */
 export const MerchantContactSchema = z.object({

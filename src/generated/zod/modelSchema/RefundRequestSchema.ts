@@ -7,6 +7,7 @@ import { RefundRequestStatusSchema } from '../inputTypeSchemas/RefundRequestStat
 /////////////////////////////////////////
 
 /**
+ * RefundRequest: Represents a request for refunding a payment
  * @group Payment
  */
 export const RefundRequestSchema = z.object({

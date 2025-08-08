@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client'
 /////////////////////////////////////////
 
 /**
+ * AddOn: Represents an additional service or item that can be attached to a booking
  * @group Inventory
  */
 export const AddOnSchema = z.object({
@@ -17,6 +18,9 @@ export const AddOnSchema = z.object({
   currency: z.string(),
   showInBooking: z.boolean(),
   isActive: z.boolean(),
+  hasInventory: z.boolean(),
+  inventoryCount: z.number().int().nullable(),
+  lowStockWarning: z.number().int().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

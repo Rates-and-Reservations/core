@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 import { NotificationTypeSchema } from '../inputTypeSchemas/NotificationTypeSchema'
 import { NotificationChannelSchema } from '../inputTypeSchemas/NotificationChannelSchema'
 
@@ -7,6 +8,7 @@ import { NotificationChannelSchema } from '../inputTypeSchemas/NotificationChann
 /////////////////////////////////////////
 
 /**
+ * NotificationTemplate: Represents a template for a notification message
  * @group Notification
  */
 export const NotificationTemplateSchema = z.object({
@@ -16,6 +18,7 @@ export const NotificationTemplateSchema = z.object({
   merchantId: z.string(),
   subject: z.string(),
   body: z.string(),
+  variables: JsonValueSchema.nullable(),
   isActive: z.boolean(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),

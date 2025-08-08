@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
+import { Prisma } from '@prisma/client'
 
 /////////////////////////////////////////
 // CUSTOMER SCHEMA
 /////////////////////////////////////////
 
 /**
+ * Customer: Represents a customer who makes bookings
  * @group Customer
  */
 export const CustomerSchema = z.object({
@@ -18,6 +20,13 @@ export const CustomerSchema = z.object({
   city: z.string().nullable(),
   postcode: z.string().nullable(),
   country: z.string().nullable(),
+  preferredLanguage: z.string().nullable(),
+  preferredTimezone: z.string().nullable(),
+  loyaltyPoints: z.number().int(),
+  totalBookings: z.number().int(),
+  totalSpent: z.instanceof(Prisma.Decimal, { message: "Field 'totalSpent' must be a Decimal. Location: ['Models', 'Customer']"}),
+  tags: z.string().array(),
+  notes: z.string().nullable(),
   metadata: JsonValueSchema.nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),

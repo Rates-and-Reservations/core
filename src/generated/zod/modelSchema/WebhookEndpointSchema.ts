@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * WebhookEndpoint: Represents a webhook URL for event notifications
  * @group Developers
  */
 export const WebhookEndpointSchema = z.object({

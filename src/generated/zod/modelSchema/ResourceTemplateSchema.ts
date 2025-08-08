@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * ResourceTemplate: Represents a template for a resource type
  * @group Inventory
  */
 export const ResourceTemplateSchema = z.object({

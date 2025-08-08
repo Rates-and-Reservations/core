@@ -6,6 +6,7 @@ import { BookingActionTypeSchema } from '../inputTypeSchemas/BookingActionTypeSc
 /////////////////////////////////////////
 
 /**
+ * BookingActivityLog: Represents a log entry for booking activity
  * @group Events
  */
 export const BookingActivityLogSchema = z.object({
@@ -20,7 +21,7 @@ export const BookingActivityLogSchema = z.object({
   description: z.string().nullable(),
   ipAddress: z.string().nullable(),
   userAgent: z.string().nullable(),
-  performedAt: z.coerce.date().nullable(),
+  performedAt: z.coerce.date(),
   performedBy: z.string().nullable(),
   createdAt: z.coerce.date(),
 })

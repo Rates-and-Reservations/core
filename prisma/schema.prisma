@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -23,10 +20,10 @@ datasource db {
 }
 
 /**
- * Merchant Models
+ * PHASE 1: Core Models (MVP - Essential for basic booking functionality)
  */
 
-//  Merchant: The main entity representing a business or organisation
+/// Merchant: The main entity representing a business or organisation
 /// @group Merchant
 model Merchant {
   id           String       @id @default(cuid())
@@ -41,6 +38,13 @@ model Merchant {
   industry     String
   category     String
 
+  // Localization & Regional Settings
+  timezone   String @default("UTC")
+  locale     String @default("en-US")
+  currency   String @default("USD")
+  dateFormat String @default("DD/MM/YYYY")
+  timeFormat String @default("24h") // 12h or 24h
+
   isVerified Boolean @default(false)
   isActive   Boolean @default(true)
 
@@ -53,71 +57,67 @@ model Merchant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Core relationships
   MerchantContact MerchantContact[]
+  MerchantUser    MerchantUser[]
+  MerchantAsset   MerchantAsset[]
+  ApiKey          ApiKey[]
+  Resource        Resource[]
+  Rate            Rate[]
+  Customer        Customer[]
+  Booking         Booking[]
+  PaymentActions  PaymentActions[]
+  Notification    Notification[]
 
-  MerchantUser MerchantUser[]
-
-  MerchantAsset MerchantAsset[]
-
-  ApiKey ApiKey[]
-
-  ResourceTemplate ResourceTemplate[]
-
-  Resource Resource[]
-
-  Rate Rate[]
-
-  Discount Discount[]
-
-  PaymentActions PaymentActions[]
-
-  Customer Customer[]
-
-  BookingRequest BookingRequest[]
-
-  Booking Booking[]
-
-  AddOn AddOn[]
-
-  BookingRequestFlow BookingRequestFlow[]
-
-  Notification Notification[]
-
-  WebhookEndpoint WebhookEndpoint[]
-
-  WebhookEvent WebhookEvent[]
-
-  AuditLog AuditLog[]
-
-  WaitlistEntry WaitlistEntry[]
-
-  Invoice Invoice[]
-
-  BookingActivityLog BookingActivityLog[]
-
-  RefundRequest RefundRequest[]
-
-  ApiUsageLog ApiUsageLog[]
-
-  ApiUsageStat ApiUsageStat[]
-
-  App App[]
-
-  AppInstall AppInstall[]
-
-  OAuthToken      OAuthToken[]
-  BookingTemplate BookingTemplate[]
-
-  UiTemplate UiTemplate[]
-
+  // Enhanced relationships
+  ResourceTemplate   ResourceTemplate[]
+  Discount           Discount[]
+  AddOn              AddOn[]
+  BookingTemplate    BookingTemplate[]
+  UiTemplate         UiTemplate[]
   CancellationPolicy CancellationPolicy[]
+  BookingRequest     BookingRequest[]
+  BookingRequestFlow BookingRequestFlow[]
+  WaitlistEntry      WaitlistEntry[]
+  Invoice            Invoice[]
+  BookingActivityLog BookingActivityLog[]
+  RefundRequest      RefundRequest[]
+  WebhookEndpoint    WebhookEndpoint[]
+  WebhookEvent       WebhookEvent[]
+  AuditLog           AuditLog[]
+  ApiUsageLog        ApiUsageLog[]
+  ApiUsageStat       ApiUsageStat[]
+
+  // Marketplace & Apps
+  App        App[]
+  AppInstall AppInstall[]
+  OAuthToken OAuthToken[]
+
+  // New advanced features
+  EventSubscription EventSubscription[]
+  PricingRule       PricingRule[]
+  Integration       Integration[]
+  ImportJob         ImportJob[]
+  ServiceLocation   ServiceLocation[]
+
+  SavedSearch         SavedSearch[]
+  ReportTemplate      ReportTemplate[]
+  SecurityLog         SecurityLog[]
+  DataRetentionPolicy DataRetentionPolicy[]
+
+  // Performance indexes
+  @@index([ownerId])
+  @@index([isActive, isDeleted])
+  @@index([country, industry])
+  @@index([timezone])
+  @@index([currency])
 }
 
-//  MerchantContact: Contact details for the merchant
+/// MerchantContact: Contact details for the merchant
 /// @group Merchant
 model MerchantContact {
   id         String    @id @default(cuid())
-  merchant   Merchant  @relation(fields: [merchantId], references: [id])
+  merchant   Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   merchantId String
   email      String
   phone      String
@@ -129,40 +129,51 @@ model MerchantContact {
   deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@index([merchantId, isDefault])
+  @@index([email])
 }
 
-//  MerchantUser: Represents a user within the merchant's organisation
+/// MerchantUser: Represents a user within the merchant's organisation
 /// @group Merchant
 model MerchantUser {
   id         String            @id @default(cuid())
-  merchant   Merchant          @relation(fields: [merchantId], references: [id])
+  merchant   Merchant          @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   merchantId String
   userId     String // Clerk user ID
-  role       OrganisationRoles // e.g. OWNER, ADMIN, STAFF
+  role       OrganisationRoles
   isActive   Boolean           @default(true)
   isVerified Boolean           @default(false)
   isDeleted  Boolean           @default(false)
   deletedAt  DateTime?
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
+
+  @@unique([merchantId, userId])
+  @@index([userId])
+  @@index([merchantId, role])
+  @@index([merchantId, isActive])
 }
 
-//  MerchantAsset: Represents a file or asset uploaded by the merchant
+/// MerchantAsset: Represents a file or asset uploaded by the merchant
 /// @group Merchant
 model MerchantAsset {
   id         String    @id @default(cuid())
-  merchant   Merchant  @relation(fields: [merchantId], references: [id])
+  merchant   Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   merchantId String
   name       String
   type       String
   url        String
-  publicId   String
+  publicId   String    @unique
   isDeleted  Boolean   @default(false)
   deletedAt  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   ResourceAsset ResourceAsset[]
+
+  @@index([merchantId, type])
+  @@index([publicId])
 }
 
 enum BusinessType {
@@ -179,179 +190,262 @@ enum OrganisationRoles {
 }
 
 /**
- * Resource Models
+ * Localization & Currency Support
  */
 
-// ResourceTemplate: Represents a template for a resource type
+/// Currency: Supported currencies for multi-currency support
+/// @group Localization
+model Currency {
+  id           String  @id @default(cuid())
+  code         String  @unique // USD, EUR, GBP
+  name         String
+  symbol       String
+  exchangeRate Decimal @db.Decimal(10, 6)
+  isActive     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+/// ServiceLocation: Physical locations where services are provided
+/// @group Location
+model ServiceLocation {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name      String
+  address   String
+  city      String
+  country   String
+  postcode  String?
+  latitude  Decimal? @db.Decimal(10, 8)
+  longitude Decimal? @db.Decimal(11, 8)
+
+  timezone String?
+  isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  Resource Resource[]
+
+  @@index([merchantId])
+  @@index([city, country])
+  @@index([latitude, longitude])
+}
+
+/**
+ * PHASE 1: Core Resource Models
+ */
+
+/// Resource: Represents a physical or virtual resource that can be booked
 /// @group Inventory
-model ResourceTemplate {
-  id         String    @id @default(cuid())
-  merchantId String?
-  merchant   Merchant? @relation(fields: [merchantId], references: [id])
+model Resource {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   name        String
-  category    String
   description String?
+  capacity    Int     @default(1)
 
-  defaultFields Json?
+  // Basic configuration
+  minDuration Int @default(60) // minutes
+  maxDuration Int @default(480) // minutes
+  bufferTime  Int @default(0) // minutes between bookings
 
+  // Location & Virtual Services
+  serviceLocationId String?
+  serviceLocation   ServiceLocation? @relation(fields: [serviceLocationId], references: [id])
+  location          Json? // { lat, lng, address, city, country } for flexible locations
+  serviceArea       Json? // Geographic service boundaries
+  isVirtual         Boolean          @default(false)
+
+  metadata Json?
+  tags     String[]
+
+  isActive  Boolean   @default(true)
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Resource Resource[]
+  // Core relationships
+  Rate    Rate[]
+  Booking Booking[]
+
+  // Advanced relationships
+  templateId            String?
+  template              ResourceTemplate?       @relation(fields: [templateId], references: [id])
+  ResourceBookingConfig ResourceBookingConfig[]
+  WaitlistEntry         WaitlistEntry[]
+  BookingRequest        BookingRequest[]
+  ResourceAsset         ResourceAsset[]
+
+  // New availability & constraints
+  AvailabilityBlock AvailabilityBlock[]
+  AvailabilityRule  AvailabilityRule[]
+  BookingConstraint BookingConstraint[]
+  CapacitySlot      CapacitySlot[]
+
+  // Performance indexes
+  @@index([merchantId, isActive, isDeleted])
+  @@index([merchantId, capacity])
+  @@index([tags])
+  @@index([serviceLocationId])
+  @@index([isVirtual])
 }
 
-// Resource: Represents a physical or virtual resource that can be booked
-/// @group Inventory
-model Resource {
+/// AvailabilityBlock: Blocks of time when a resource is unavailable
+/// @group Availability
+model AvailabilityBlock {
   id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
-  templateId String
-  template   ResourceTemplate @relation(fields: [templateId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  blockType BlockType
+  reason    String?
 
-  name        String
-  description String?
-  capacity    Int
+  // Recurring availability blocks
+  isRecurring    Boolean @default(false)
+  recurrenceRule Json? // RRULE for recurring blocks
 
-  metadata Json?
+  isActive  Boolean   @default(true)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
-  tags String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([resourceId, startTime, endTime])
+  @@index([blockType])
+  @@index([isRecurring])
+}
+
+enum BlockType {
+  MAINTENANCE
+  PRIVATE_EVENT
+  HOLIDAY
+  CUSTOM
+  SYSTEM_BLOCK
+}
+
+/// AvailabilityRule: Defines when a resource is available (e.g., business hours)
+/// @group Availability
+model AvailabilityRule {
+  id         String   @id @default(cuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  dayOfWeek Int // 0-6 (Sunday-Saturday)
+  startTime String // "09:00"
+  endTime   String // "17:00"
+
+  // Seasonal availability
+  validFrom DateTime?
+  validTo   DateTime?
 
   isActive Boolean @default(true)
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Rate Rate[]
-
-  ResourceBookingConfig ResourceBookingConfig[]
-
-  WaitlistEntry WaitlistEntry[]
-
-  BookingRequest BookingRequest[]
-
-  ResourceAsset ResourceAsset[]
+  @@index([resourceId, dayOfWeek])
+  @@index([validFrom, validTo])
 }
 
-// ResourceBookingConfig: Represents the booking configuration for a resource
-/// @group Inventory
-model ResourceBookingConfig {
+/// BookingConstraint: Advanced booking rules and constraints
+/// @group Availability
+model BookingConstraint {
   id         String   @id @default(cuid())
   resourceId String
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
-  minDuration Int
-  maxDuration Int
-  bufferTime  Int
-
-  availableDays Json? // [{ day: "Monday", open: "09:00", close: "17:00" }]
-  blackoutDates Json? // ["2025-12-25", "2025-12-26"]
-
-  allowMultipleBookings Boolean @default(false)
-  enableWaitlist        Boolean @default(false)
-
-  cancellationPolicyId String?
-  cancellationPolicy   CancellationPolicy? @relation(fields: [cancellationPolicyId], references: [id])
-
-  isActive Boolean @default(true) // resource booking on/off
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  constraintType ConstraintType
+  value          Json // Flexible constraint data
+  description    String?
+  isActive       Boolean        @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([resourceId, constraintType])
+  @@index([isActive])
 }
 
-// AddOn: Represents an additional service or item that can be attached to a booking
-/// @group Inventory
-model AddOn {
+enum ConstraintType {
+  MIN_ADVANCE_BOOKING // Must book X hours/days in advance
+  MAX_ADVANCE_BOOKING // Cannot book more than X days ahead
+  MAX_BOOKINGS_PER_DAY // Customer can only book X times per day
+  MAX_BOOKINGS_PER_WEEK // Customer can only book X times per week
+  BUFFER_TIME // Minimum time between bookings
+  CAPACITY_LIMIT // Maximum concurrent bookings
+  BLACKOUT_DATES // Specific dates when booking is not allowed
+  MINIMUM_PARTY_SIZE // Minimum number of people
+  MAXIMUM_PARTY_SIZE // Maximum number of people
+}
+
+/// CapacitySlot: Tracks capacity utilization over time
+/// @group Availability
+model CapacitySlot {
   id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name          String
-  description   String?
-  price         Decimal
-  currency      String
-  showInBooking Boolean   @default(true)
-  isActive      Boolean   @default(true)
-  isDeleted     Boolean   @default(false)
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  RateAddOn RateAddOn[]
-
-  BookingItemAddOn BookingItemAddOn[]
-
-  BookingAddOn BookingAddOn[]
-}
-
-// ResourceAsset: Represents an asset (image, file) associated with a resource
-/// @group Inventory
-model ResourceAsset {
-  id String @id @default(cuid())
-
   resourceId String
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
-  assetId String
-  asset   MerchantAsset @relation(fields: [assetId], references: [id])
-
-  isPrimary Boolean @default(false) // Optional: for thumbnail/featured image
-  sortOrder Int     @default(0) // Optional: for image ordering in galleries
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  startTime     DateTime
+  endTime       DateTime
+  totalCapacity Int
+  bookedCount   Int      @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([resourceId, startTime, endTime])
+  @@index([startTime, endTime])
 }
 
-/**
- * Pricing Models
- */
-
-// Rate: Represents a pricing rate for a resource
+/// Rate: Represents a pricing rate for a resource
 /// @group Pricing
 model Rate {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   resourceId String
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
 
   name        String
   description String?
 
-  price    Decimal
-  currency String
+  price    Decimal @db.Decimal(10, 2)
+  currency String  @default("USD")
 
-  durationType RateDurationType
+  durationType RateDurationType @default(PER_HOUR)
   isDefault    Boolean          @default(false)
   isPublished  Boolean          @default(true)
-  isActive     Boolean          @default(true) // flag if this rate is usable
+  isActive     Boolean          @default(true)
 
-  orderIndex Int @default(0) // Optional: for sorting rates
+  orderIndex Int @default(0)
 
-  bookingStartDate DateTime?
-  bookingEndDate   DateTime?
+  // Simplified date ranges for Phase 1
+  validFrom DateTime?
+  validTo   DateTime?
 
-  usageStartDate DateTime?
-  usageEndDate   DateTime?
-
-  // ✅ Tax rules stay here (related to price)
+  // Tax configuration
   taxType   TaxType @default(PERCENTAGE)
-  taxAmount Decimal @default(0)
+  taxAmount Decimal @default(0) @db.Decimal(5, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -359,17 +453,29 @@ model Rate {
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
-  Discount Discount[]
+  // Core relationships
+  Booking             Booking[]
+  BookingRateSnapshot BookingRateSnapshot[]
 
+  // Advanced relationships
+  Discount  Discount[]
   RateAddOn RateAddOn[]
 
-  BookingRateSnapshot BookingRateSnapshot[]
+  // Performance indexes
+  @@index([resourceId, isActive, isPublished])
+  @@index([merchantId, isActive])
+  @@index([validFrom, validTo])
+  @@index([price])
+  @@index([currency])
 }
 
 enum RateDurationType {
   PER_HOUR
   PER_DAY
   PER_NIGHT
+  PER_WEEK
+  PER_MONTH
+  FIXED_PRICE
 }
 
 enum TaxType {
@@ -378,565 +484,56 @@ enum TaxType {
   FIXED
 }
 
-// RateAddOn: Represents an add-on that can be attached to a rate
-/// @group Pricing
-model RateAddOn {
-  id      String @id @default(cuid())
-  rateId  String
-  addOnId String
-
-  rate  Rate  @relation(fields: [rateId], references: [id])
-  addOn AddOn @relation(fields: [addOnId], references: [id])
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Discount: Represents a discount that can be applied to a rate
-/// @group Pricing
-model Discount {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  code        String? // Optional if auto-applied
-  description String?
-
-  discountType DiscountType // PERCENTAGE or FIXED
-  amount       Decimal
-
-  appliesToRates Rate[] // Optional: connect to specific rates or leave global
-
-  usageLimit Int? // e.g., max 100 uses
-  usedCount  Int  @default(0)
-
-  startDate DateTime?
-  endDate   DateTime?
-
-  isActive Boolean @default(true)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum DiscountType {
-  PERCENTAGE
-  FIXED
-}
-
 /**
- * Booking Configuration Models
+ * Advanced Pricing Models
  */
 
-// BookingTemplate: Represents a template for a booking flow
-/// @group BookingConfiguration
-model BookingTemplate {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name          String
-  description   String?
-  selectionMode SelectionMode // SINGLE or MULTI
-  config        Json // Arbitrary config like required fields, limits, etc.
-  actions       BookingAction[] // List of actions this template expects
-  isDeleted     Boolean         @default(false)
-  deletedAt     DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  BookingRequest BookingRequest[]
-}
-
-// BookingAction: Represents a step or action in a booking flow
-/// @group BookingConfiguration
-model BookingAction {
-  id                String          @id @default(cuid())
-  bookingTemplateId String
-  bookingTemplate   BookingTemplate @relation(fields: [bookingTemplateId], references: [id])
-
-  name                      String // e.g., “Choose room”, “Select duration”
-  type                      ActionType // ENUM: RESOURCE_SELECT, DATE_SELECT, ADD_ON_SELECT, etc.
-  config                    Json // e.g., resource IDs, allowed date range, etc.
-  required                  Boolean                     @default(true)
-  BookingRequestActionValue BookingRequestActionValue[]
-  isDeleted                 Boolean                     @default(false)
-  deletedAt                 DateTime?
-  createdAt                 DateTime                    @default(now())
-  updatedAt                 DateTime                    @updatedAt
-}
-
-// UiTemplate: Represents a template for the booking UI
-/// @group BookingConfiguration
-model UiTemplate {
-  id              String  @id @default(cuid())
-  name            String
-  description     String?
-  previewImageUrl String? // Preview of template design
-  isSystem        Boolean @default(false)
-
-  merchantId String? // Null if it's a system template
-  merchant   Merchant? @relation(fields: [merchantId], references: [id])
-  config     Json // Branding, layout, custom fields
-
-  uiTheme String? // URL to custom layout/theme
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  BookingRequestFlow BookingRequestFlow[]
-}
-
-enum SelectionMode {
-  SINGLE
-  MULTI
-}
-
-enum ActionType {
-  DATE_SELECT
-  RESOURCE_SELECT
-  CUSTOMER_DETAILS
-  ADD_ON_SELECT
-  INPUT_FIELD
-  PAYMENT_SELECT
-}
-
-// BookingRequest: Represents a booking request made by a customer
-/// @group BookingSetup
-model BookingRequest {
+/// PricingRule: Dynamic pricing rules based on demand, time, etc.
+/// @group Pricing
+model PricingRule {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  prefilledFields Json? // Optional: pre-fill custom fields
-
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
-
-  resourceId String?
-  resource   Resource? @relation(fields: [resourceId], references: [id])
-
-  templateId String
-  template   BookingTemplate @relation(fields: [templateId], references: [id])
-
-  expiresAt DateTime? // Optional: when this request is no longer valid
-  isActive  Boolean   @default(true)
-
-  notes String?
-
-  status            BookingRequestStatus // INITIATED | IN_PROGRESS | COMPLETED | FAILED
-  actionStatus      Json // { actionId: status } mapping, optional details
-  finalizedSnapshot Json?
-  isDeleted         Boolean              @default(false)
-  deletedAt         DateTime?
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
-
-  BookingRequestFlow BookingRequestFlow[]
-
-  BookingRequestActionValue BookingRequestActionValue[]
-
-  Booking Booking[]
-}
-
-// BookingRequestActionValue: Represent the state of a booking action in a request
-/// @group BookingSetup
-model BookingRequestActionValue {
-  id               String         @id @default(cuid())
-  bookingRequestId String
-  bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id])
-
-  bookingActionId String
-  bookingAction   BookingAction @relation(fields: [bookingActionId], references: [id])
-
-  value       Json // Can be a resourceId, date range, array of add-ons, etc.
-  completedAt DateTime  @default(now())
-  isDeleted   Boolean   @default(false)
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-}
-
-enum BookingRequestStatus {
-  INITIATED
-  IN_PROGRESS
-  COMPLETED
-  FAILED
-}
-
-// BookingRequestFlow: Represents a flow that can be shared for booking
-/// @group BookingSetup
-model BookingRequestFlow {
-  id               String         @id @default(cuid())
-  bookingRequestId String
-  bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id])
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  uiTemplateId String
-  uiTemplate   UiTemplate @relation(fields: [uiTemplateId], references: [id])
-
-  slug String @unique // Link slug for sharing: /book/{slug}
-
-  usageLimit Int? // Max number of times this flow can be used
-  usageCount Int  @default(0)
-
-  webhookUrl    String? // Optional: notify when booking is completed
-  webhookEvents Json? // e.g., ["booking.created"]
-
-  isActive  Boolean   @default(true)
-  expiresAt DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-/**
- * Core Booking Models
- */
-
-// BookingItem: Represents a single item in a booking (e.g., room, table, ticket)
-/// @group Booking
-model BookingItem {
-  id String @id @default(cuid())
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  startTime DateTime
-  endTime   DateTime
-
-  currentStatus BookingItemStatus
-
-  bookingRateSnapshotId String
-  bookingRateSnapshot   BookingRateSnapshot @relation(fields: [bookingRateSnapshotId], references: [id])
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  BookingItemAddOn BookingItemAddOn[]
-
-  CancellationRequest CancellationRequest[]
-
-  BookingItemTransition BookingItemTransition[]
-}
-
-// BookingItemAddOn: Represents an add-on attached to a booking item
-/// @group Booking
-model BookingItemAddOn {
-  id String @id @default(cuid())
-
-  bookingItemId String
-  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
-
-  addOnId String
-  addOn   AddOn  @relation(fields: [addOnId], references: [id])
-
-  addOnName  String
-  unitPrice  Decimal
-  quantity   Int     @default(1)
-  totalPrice Decimal
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// BookingTransition: Represents a change in the status of a booking
-/// @group Booking
-model BookingItemTransition {
-  id String @id @default(cuid())
-
-  bookingItemId String
-  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id])
-
-  fromStatus BookingItemStatus
-  toStatus   BookingItemStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum BookingItemStatus {
-  PENDING // Item added, not yet confirmed
-  CONFIRMED // Successfully booked
-  CANCELLED // Canceled before or after confirmation
-  COMPLETED // Booking fulfilled (e.g., stay completed)
-  FAILED // Could not be booked (e.g., resource unavailable)
-  WAITLISTED // On waitlist for this resource
-  IN_USE // Checked in / currently active (if live tracking is needed)
-}
-
-// Booking: Represents a confirmed booking made by a customer
-/// @group Booking
-model Booking {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
-
-  bookingRequestId String?
-  bookingRequest   BookingRequest? @relation(fields: [bookingRequestId], references: [id])
-
-  startTime DateTime
-  endTime   DateTime
-
-  currentStatus BookingStatus
-
-  // Additional
-  notes         String?
-  internalNotes String?
-
-  metadata Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  PaymentActions PaymentActions[]
-
-  Notification Notification[]
-
-  Invoice Invoice[]
-
-  BookingActivityLog BookingActivityLog[]
-
-  RefundRequest RefundRequest[]
-
-  BookingItem BookingItem[]
-
-  BookingAddOn BookingAddOn[]
-
-  CancellationRequest CancellationRequest[]
-
-  BookingTransition BookingTransition[]
-}
-
-// BookingTransition: Represents a change in the status of a booking
-/// @group Booking
-model BookingTransition {
-  id String @id @default(cuid())
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  fromStatus BookingStatus
-  toStatus   BookingStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// BookingAddOn: Represents an add-on attached to a booking
-/// @group Booking
-model BookingAddOn {
-  id String @id @default(cuid())
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  addOnId String?
-  addOn   AddOn?  @relation(fields: [addOnId], references: [id])
-
-  addOnName  String
-  quantity   Int     @default(1)
-  unitPrice  Decimal
-  totalPrice Decimal
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// BookingRateSnapshot: Represents a snapshot of a rate at the time of booking
-/// @group Booking
-model BookingRateSnapshot {
-  id String @id @default(cuid())
-
-  rateId String
-  rate   Rate   @relation(fields: [rateId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   name        String
   description String?
+  ruleType    PricingRuleType
+  conditions  Json // Time-based, demand-based, etc.
+  adjustment  Json // Percentage or fixed adjustment
+  priority    Int             @default(0)
+  isActive    Boolean         @default(true)
 
-  price    Decimal
-  currency String
-
-  durationType RateDurationType
-  isDefault    Boolean          @default(false)
-  isActive     Boolean          @default(true) // flag if this rate is usable
-
-  bookingStartDate DateTime?
-  bookingEndDate   DateTime?
-
-  usageStartDate DateTime?
-  usageEndDate   DateTime?
-
-  taxType   TaxType @default(PERCENTAGE)
-  taxAmount Decimal @default(0)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  validFrom DateTime?
+  validTo   DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  BookingItem BookingItem[]
+  @@index([merchantId, ruleType])
+  @@index([isActive, priority])
+  @@index([validFrom, validTo])
 }
 
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
+enum PricingRuleType {
+  TIME_BASED // Peak hours, weekends
+  DEMAND_BASED // High demand periods
+  SEASONAL // Holiday pricing
+  BULK_DISCOUNT // Multiple bookings
+  LAST_MINUTE // Last-minute bookings
+  EARLY_BIRD // Early booking discounts
+  LOYALTY // Loyal customer discounts
 }
 
-// CancelationPolicy: Represents a policy for booking cancellations
-/// @group Booking
-model CancellationPolicy {
-  id String @id @default(cuid())
+/**
+ * PHASE 1: Core Booking Models
+ */
 
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  name           String
-  description    String?
-  refundType     RefundType // FULL, PARTIAL, NONE
-  refundAmount   Decimal? // Used if PARTIAL
-  timeLimitHours Int? // How many hours before booking start is allowed
-
-  appliesTo CancellationScope @default(BOOKING) // BOOKING or ITEM
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ResourceBookingConfig ResourceBookingConfig[]
-}
-
-enum RefundType {
-  FULL
-  PARTIAL
-  NONE
-}
-
-enum CancellationScope {
-  BOOKING
-  ITEM
-}
-
-// CancellationRequest: Represents a request to cancel a booking
-/// @group Booking
-model CancellationRequest {
-  id String @id @default(cuid())
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  bookingItemId String?
-  bookingItem   BookingItem? @relation(fields: [bookingItemId], references: [id])
-
-  requestedBy String? // Clerk user or customer ID
-  reason      String?
-  source      CancellationSource @default(CUSTOMER) // CUSTOMER | SYSTEM | SUPPORT
-
-  currentStatus CancellationStatus @default(PENDING)
-
-  processedAt DateTime?
-  approvedBy  String?
-  approvedAt  DateTime?
-  declinedAt  DateTime?
-
-  refundAmount Decimal?
-  notes        String?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  CancellationRequestTransition CancellationRequestTransition[]
-}
-
-// CancellationRequestTransition: Represents a change in the status of a cancellation request
-/// @group Booking
-model CancellationRequestTransition {
-  id String @id @default(cuid())
-
-  cancellationRequestId String
-  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id])
-
-  fromStatus CancellationStatus
-  toStatus   CancellationStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum CancellationStatus {
-  PENDING
-  APPROVED
-  DECLINED
-  CANCELLED
-}
-
-enum CancellationSource {
-  CUSTOMER
-  SUPPORT
-  SYSTEM
-}
-
-// Customer: Represents a customer who makes bookings
+/// Customer: Represents a customer who makes bookings
 /// @group Customer
 model Customer {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   name  String
   email String
@@ -947,6 +544,15 @@ model Customer {
   postcode String?
   country  String?
 
+  // Enhanced customer features
+  preferredLanguage String?
+  preferredTimezone String?
+  loyaltyPoints     Int      @default(0)
+  totalBookings     Int      @default(0)
+  totalSpent        Decimal  @default(0) @db.Decimal(10, 2)
+  tags              String[] // For segmentation
+  notes             String?
+
   metadata Json?
 
   isDeleted Boolean   @default(false)
@@ -955,43 +561,76 @@ model Customer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Core relationships
+  Booking      Booking[]
   Notification Notification[]
 
-  WaitlistEntry WaitlistEntry[]
+  // Enhanced relationships
+  WaitlistEntry      WaitlistEntry[]
+  Invoice            Invoice[]
+  BookingRequest     BookingRequest[]
+  Review             Review[]
+  CustomerPreference CustomerPreference[]
 
-  Invoice Invoice[]
-
-  BookingRequest BookingRequest[]
-
-  Booking Booking[]
+  @@unique([merchantId, email])
+  // Performance indexes
+  @@index([merchantId, email])
+  @@index([merchantId, isDeleted])
+  @@index([email])
+  @@index([tags])
+  @@index([totalBookings])
 }
 
-// WaitlistEntry: Represents a customer waiting for a resource
-/// @group Waitlist
-model WaitlistEntry {
-  id String @id @default(cuid())
+/// CustomerPreference: Customer preferences and settings
+/// @group Customer
+model CustomerPreference {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+  key   String // "preferred_time", "notification_method", "dietary_requirements"
+  value String // "morning", "email", "vegetarian"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([customerId, key])
+  @@index([key])
+}
+
+/// Booking: Represents a confirmed booking made by a customer
+/// @group Booking
+model Booking {
+  id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  resourceId String
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   customerId String?
   customer   Customer? @relation(fields: [customerId], references: [id])
 
-  // Optional pre-filled timeslot the customer is waiting for
-  desiredStartTime DateTime?
-  desiredEndTime   DateTime?
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
 
-  currentStatus WaitlistStatus
+  rateId String
+  rate   Rate   @relation(fields: [rateId], references: [id])
 
-  notes String?
+  startTime DateTime
+  endTime   DateTime
 
-  priority Int @default(0) // Optional: manual sorting or ranking
+  // Party size for capacity management
+  partySize Int @default(1)
 
-  notifiedAt DateTime?
-  promotedAt DateTime? // If they were converted into a booking
+  // Pricing snapshot at booking time
+  basePrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+  taxAmount  Decimal @default(0) @db.Decimal(10, 2)
+  currency   String  @default("USD")
+
+  currentStatus BookingStatus @default(PENDING)
+
+  notes         String?
+  internalNotes String?
+  metadata      Json?
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
@@ -999,59 +638,258 @@ model WaitlistEntry {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  WaitlistEntryTransition WaitlistEntryTransition[]
+  // Core relationships
+  PaymentActions PaymentActions[]
+  Notification   Notification[]
+
+  // Enhanced relationships
+  bookingRequestId    String?
+  bookingRequest      BookingRequest?       @relation(fields: [bookingRequestId], references: [id])
+  Invoice             Invoice[]
+  BookingActivityLog  BookingActivityLog[]
+  RefundRequest       RefundRequest[]
+  BookingItem         BookingItem[]
+  BookingAddOn        BookingAddOn[]
+  CancellationRequest CancellationRequest[]
+  BookingTransition   BookingTransition[]
+  Review              Review?
+
+  // Performance indexes
+  @@index([merchantId, currentStatus])
+  @@index([merchantId, startTime, endTime])
+  @@index([resourceId, startTime, endTime])
+  @@index([customerId])
+  @@index([createdAt])
+  @@index([partySize])
 }
 
-// WaitlistEntryTransition: Represents a change in the status of a waitlist entry
-/// @group Waitlist
-model WaitlistEntryTransition {
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+/// Review: Customer reviews and ratings for bookings
+/// @group Review
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  rating   Int // 1-5 stars
+  title    String?
+  comment  String?
+  isPublic Boolean @default(true)
+
+  // Merchant response
+  merchantResponse String?
+  respondedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([rating])
+  @@index([isPublic])
+  @@index([createdAt])
+}
+
+/// BookingRateSnapshot: Represents a snapshot of a rate at booking time
+/// @group Booking
+model BookingRateSnapshot {
   id String @id @default(cuid())
 
-  waitlistEntryId String
-  waitlistEntry   WaitlistEntry @relation(fields: [waitlistEntryId], references: [id])
+  rateId String
+  rate   Rate   @relation(fields: [rateId], references: [id])
 
-  fromStatus BookingItemStatus
-  toStatus   BookingItemStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
+  name        String
+  description String?
+
+  price    Decimal @db.Decimal(10, 2)
+  currency String
+
+  durationType RateDurationType
+  isDefault    Boolean          @default(false)
+  isActive     Boolean          @default(true)
+
+  validFrom DateTime?
+  validTo   DateTime?
+
+  taxType   TaxType @default(PERCENTAGE)
+  taxAmount Decimal @default(0) @db.Decimal(5, 2)
 
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-enum WaitlistStatus {
-  ACTIVE
-  CANCELLED
-  NOTIFIED
-  PROMOTED
+  BookingItem BookingItem[]
+
+  @@index([rateId])
 }
 
 /**
- * Payment, Invoicing and Refund Models
+ * Real-time Events & Notifications
  */
 
-// PaymentActions: Represents a payment transaction for a booking
+/// EventSubscription: Subscriptions for real-time updates
+/// @group Events
+model EventSubscription {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  endpoint String // WebSocket endpoint or callback URL
+  events   Json // ["booking.created", "availability.changed"]
+  isActive Boolean @default(true)
+
+  lastPingAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, isActive])
+}
+
+/// SystemEvent: System-wide events for real-time processing
+/// @group Events
+model SystemEvent {
+  id         String @id @default(cuid())
+  eventType  String // "booking.created", "resource.updated"
+  entityId   String // ID of the affected entity
+  entityType String // "Booking", "Resource"
+  payload    Json
+
+  processed   Boolean   @default(false)
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([eventType, processed])
+  @@index([entityId, entityType])
+  @@index([createdAt])
+}
+
+/**
+ * Integration & External Systems
+ */
+
+/// Integration: External system integrations
+/// @group Integration
+model Integration {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name            String
+  integrationType IntegrationType
+  config          Json // Integration-specific configuration
+  credentials     Json // Encrypted credentials
+  isActive        Boolean         @default(true)
+
+  lastSyncAt     DateTime?
+  lastSyncStatus String? // "success", "error", "partial"
+  syncErrors     Json? // Array of sync errors
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, integrationType])
+  @@index([isActive])
+  @@index([lastSyncAt])
+}
+
+enum IntegrationType {
+  GOOGLE_CALENDAR
+  OUTLOOK_CALENDAR
+  APPLE_CALENDAR
+  ZOOM
+  GOOGLE_MEET
+  MICROSOFT_TEAMS
+  STRIPE
+  PAYPAL
+  SQUARE
+  MAILCHIMP
+  SENDGRID
+  TWILIO
+  SLACK
+  ZAPIER
+  CUSTOM_WEBHOOK
+}
+
+/**
+ * Data Import/Export
+ */
+
+/// ImportJob: Track data import operations
+/// @group Import
+model ImportJob {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  jobType       ImportJobType
+  fileName      String
+  status        JobStatus     @default(PENDING)
+  totalRows     Int?
+  processedRows Int           @default(0)
+  errorRows     Int           @default(0)
+  errors        Json?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, jobType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ImportJobType {
+  CUSTOMERS
+  RESOURCES
+  BOOKINGS
+  RATES
+  AVAILABILITY
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+/**
+ * PHASE 1: Payment Models
+ */
+
+/// PaymentActions: Represents a payment transaction for a booking
 /// @group Payment
 model PaymentActions {
   id        String  @id @default(cuid())
   bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   provider          String // e.g., "stripe"
   providerPaymentId String // external payment reference
 
-  amount   Decimal
+  amount   Decimal       @db.Decimal(10, 2)
   currency String
   status   PaymentStatus @default(PENDING)
 
-  refundedAmount Decimal @default(0)
+  refundedAmount Decimal @default(0) @db.Decimal(10, 2)
   paymentMethod  String? // e.g., "card", "wallet"
 
   isDeleted Boolean   @default(false)
@@ -1060,11 +898,15 @@ model PaymentActions {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  RefundRequest RefundRequest[]
-
-  RefundLog RefundLog[]
-
+  RefundRequest  RefundRequest[]
+  RefundLog      RefundLog[]
   InvoicePayment InvoicePayment[]
+
+  // Performance indexes
+  @@index([merchantId, status])
+  @@index([bookingId])
+  @@index([providerPaymentId])
+  @@index([createdAt])
 }
 
 enum PaymentStatus {
@@ -1072,553 +914,19 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
-}
-
-// Invoice: Represents an invoice for a booking or payment
-/// @group Payment
-model Invoice {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  bookingId String?
-  booking   Booking? @relation(fields: [bookingId], references: [id])
-
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
-
-  invoiceNumber String @unique // e.g., INV-2024-0001
-  currency      String
-
-  subtotal       Decimal
-  taxAmount      Decimal
-  discountAmount Decimal
-  totalAmount    Decimal
-
-  status    InvoiceStatus @default(PENDING)
-  issueDate DateTime
-  dueDate   DateTime?
-  paidAt    DateTime?
-
-  notes  String?
-  pdfUrl String? // Link to generated PDF (optional)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  InvoicePayment InvoicePayment[]
-
-  InvoiceItem InvoiceItem[]
-
-  InvoiceHistory InvoiceHistory[]
-}
-
-// InvoiceItem: Represents an item in an invoice
-/// @group Payment
-model InvoiceItem {
-  id String @id @default(cuid())
-
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
-
-  description String
-  amount      Decimal
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// InvoiceHistory: Represents a history of changes to an invoice
-/// @group Payment
-model InvoiceHistory {
-  id String @id @default(cuid())
-
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
-
-  fromStatus InvoiceStatus
-  toStatus   InvoiceStatus
-  reason     String?
-  notes      String?
-  metadata   Json?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  OVERDUE
-  CANCELLED
-}
-
-// InvoicePayment: Represents a payment made against an invoice
-/// @group Payment
-model InvoicePayment {
-  id        String  @id @default(cuid())
-  invoiceId String
-  invoice   Invoice @relation(fields: [invoiceId], references: [id])
-
-  paymentId String
-  payment   PaymentActions @relation(fields: [paymentId], references: [id])
-
-  amountPaid Decimal
-  paidAt     DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// InvoicePayment: Represents a payment made against an invoice
-/// @group Payment
-model RefundRequest {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  paymentTransactionId String
-  paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
-
-  amount   Decimal
-  currency String
-
-  reason String?
-  status RefundRequestStatus @default(PENDING)
-
-  approvedBy String? // Clerk user ID of the approver (optional)
-  approvedAt DateTime?
-  rejectedAt DateTime?
-
-  requestedBy String? // Clerk user ID of requester (optional)
-  requestedAt DateTime @default(now())
-
-  processedAt DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  RefundLog RefundLog[]
-}
-
-enum RefundRequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  PROCESSED
-}
-
-// RefundLog: Represents a log entry for a refund transaction
-/// @group Payment
-model RefundLog {
-  id String @id @default(cuid())
-
-  refundRequestId String
-  refundRequest   RefundRequest @relation(fields: [refundRequestId], references: [id])
-
-  paymentTransactionId String
-  paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
-
-  amount   Decimal
-  currency String
-
-  provider         String // e.g., "stripe"
-  providerRefundId String // ID returned by Stripe or payment processor
-
-  status       RefundStatus @default(PENDING)
-  errorMessage String?
-
-  processedAt DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum RefundStatus {
-  PENDING
-  SUCCESS
-  FAILED
+  PARTIALLY_REFUNDED
 }
 
 /**
- * Notifications and Messaging Models
+ * PHASE 1: API and Developer Models
  */
 
-// Notification: Represents a notification message sent to a customer or merchant
-/// @group Notification
-model Notification {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  bookingId String?
-  booking   Booking? @relation(fields: [bookingId], references: [id])
-
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
-
-  type    NotificationType // e.g., BOOKING_CONFIRMED, REMINDER, PAYMENT_RECEIPT
-  channel NotificationChannel // EMAIL, SMS
-
-  notificationTemplateId String?
-  template               NotificationTemplate? @relation(fields: [notificationTemplateId], references: [id])
-
-  recipient String // Email address or phone number
-  subject   String?
-  message   String
-
-  errorMessage String?
-
-  sentAt DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  NotificationLog NotificationLog[]
-}
-
-// NotificationLog: Represents a log entry for a notification message
-/// @group Notification
-model NotificationLog {
-  id String @id @default(cuid())
-
-  notificationId String
-  notification   Notification @relation(fields: [notificationId], references: [id])
-
-  status NotificationStatus
-
-  errorMessage String?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// NotificationTemplate: Represents a template for a notification message
-/// @group Notification
-model NotificationTemplate {
-  id         String              @id @default(cuid())
-  merchantId String
-  type       NotificationType // e.g., BOOKING_CONFIRMED
-  channel    NotificationChannel
-
-  subject String
-  body    String // Can support variables: {{customerName}}, {{bookingDate}}
-
-  isActive Boolean @default(true)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Notification Notification[]
-}
-
-enum NotificationType {
-  MERCHANT_USER_INVITE
-  BOOKING_CONFIRMED
-  BOOKING_CANCELLED
-  BOOKING_REMINDER
-  PAYMENT_RECEIPT
-}
-
-enum NotificationChannel {
-  EMAIL
-  SMS
-}
-
-enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
-}
-
-/**
- * App marketplace models
- */
-
-// App: Represents a third-party app or integration
-/// @group App
-model App {
-  id String @id @default(cuid())
-
-  name        String
-  description String?
-  logoUrl     String?
-  websiteUrl  String?
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  clientId     String? // For OAuth apps
-  clientSecret String? // For OAuth apps (store securely!)
-
-  redirectUrls Json? // OAuth redirects (if using OAuth)
-  webhookUrl   String? // Optional webhook to notify the app
-
-  scopes Json? // ["bookings:read", "payments:write"]
-
-  isPublic    Boolean @default(false)
-  isPublished Boolean @default(false)
-  isActive    Boolean @default(true)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  AppInstall AppInstall[]
-
-  OAuthToken OAuthToken[]
-}
-
-// AppInstall: Represents an installed instance of an app
-/// @group App
-model AppInstall {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  appId String
-  app   App    @relation(fields: [appId], references: [id])
-
-  status AppInstallStatus @default(PENDING)
-
-  installedAt   DateTime?
-  uninstalledAt DateTime?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  AppInstallScope AppInstallScope[]
-}
-
-enum AppInstallStatus {
-  PENDING
-  ACTIVE
-  SUSPENDED
-  UNINSTALLED
-}
-
-// AppScope: Represents a permission scope for an app
-/// @group App
-model AppScope {
-  id String @id @default(cuid())
-
-  name        String // e.g., "bookings:read"
-  description String?
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-
-  AppInstallScope AppInstallScope[]
-}
-
-// AppInstallScope: Represents a granted scope for an app install
-/// @group App
-model AppInstallScope {
-  id String @id @default(cuid())
-
-  appInstallId String
-  appInstall   AppInstall @relation(fields: [appInstallId], references: [id])
-
-  scopeId String
-  scope   AppScope @relation(fields: [scopeId], references: [id])
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-}
-
-// OAuthToken: Represents an OAuth token for an app install
-/// @group App
-model OAuthToken {
-  id String @id @default(cuid())
-
-  appId String
-  app   App    @relation(fields: [appId], references: [id])
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  accessToken  String
-  refreshToken String?
-  expiresAt    DateTime?
-
-  scopes Json? // Optional: list of granted scopes
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-}
-
-/**
- * Events, Usage and analytics models
- */
-
-// ApiUsageLog: Represents a log entry for API usage
-/// @group Events
-model ApiUsageLog {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  apiKeyId String
-  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
-
-  endpoint   String // e.g., "/v1/bookings"
-  method     String // GET, POST, etc.
-  statusCode Int // 200, 404, 500, etc.
-
-  ipAddress String?
-  userAgent String?
-
-  responseTimeMs    Int // Response time in milliseconds
-  rateLimitExceeded Boolean @default(false)
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-}
-
-// ApiUsageStat: Represents a daily usage summary for an API key
-/// @group Events
-model ApiUsageStat {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  apiKeyId String
-  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
-
-  date          DateTime // e.g., "2025-03-24"
-  requestCount  Int // Total requests on this date
-  successCount  Int // 2xx responses
-  errorCount    Int // 4xx, 5xx responses
-  rateLimitHits Int
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-}
-
-// BookingActivityLog: Represents a log entry for booking activity
-/// @group Events
-model BookingActivityLog {
-  id String @id @default(cuid())
-
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  bookingId String
-  booking   Booking @relation(fields: [bookingId], references: [id])
-
-  userId       String? // Optional: Clerk user ID if a merchant user made the change
-  systemAction Boolean @default(false) // True if it was system-triggered (e.g., auto-cancel)
-
-  action        BookingActionType // e.g., STATUS_CHANGED, PAYMENT_UPDATED, CUSTOMER_NOTIFIED
-  previousValue String? // JSON or string snapshot (optional)
-  newValue      String? // JSON or string snapshot (optional)
-
-  description String? // Optional human-readable description
-  ipAddress   String?
-  userAgent   String?
-
-  performedAt DateTime?
-  performedBy String? // Clerk user ID or system
-
-  createdAt DateTime @default(now())
-}
-
-enum BookingActionType {
-  CREATED
-  UPDATED
-  CANCELLED
-  STATUS_CHANGED
-  PAYMENT_UPDATED
-  CUSTOMER_NOTIFIED
-  REFUNDED
-}
-
-// AuditLog: Represents a log entry for merchant activity
-/// @group Events
-model AuditLog {
-  id         String   @id @default(cuid())
-  merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
-
-  userId       String? // Clerk userId (optional if system-initiated)
-  action       String // e.g., "booking.created", "rate.updated"
-  resourceType String // e.g., "Booking", "Rate"
-  resourceId   String? // Optional: link to the specific entity
-
-  description String? // e.g., "John Doe confirmed booking #ABC123"
-
-  ipAddress String? // Optional: for security/audit trail
-  userAgent String? // Optional: client browser/device info
-
-  performedAt DateTime?
-  performedBy String? // Clerk user ID or system
-
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-
-  createdAt DateTime @default(now())
-}
-
-/**
- * Developers: Webhooks and event models
- */
-
-// ApiKey: Represents an API key for merchant API access
+/// ApiKey: Represents an API key for merchant API access
 /// @group Developers
 model ApiKey {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   keyHash     String  @unique // Hashed + secure storage (NEVER plain text)
   label       String? // "Dashboard Key", "Public API Key"
@@ -1635,22 +943,1206 @@ model ApiKey {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ApiUsageLog ApiUsageLog[]
-
+  ApiUsageLog  ApiUsageLog[]
   ApiUsageStat ApiUsageStat[]
+
+  @@index([merchantId, isActive])
+  @@index([keyHash])
+  @@index([lastUsedAt])
 }
 
-// WebhookEndpoint: Represents a webhook URL for event notifications
+/**
+ * PHASE 1: Notification Models
+ */
+
+/// Notification: Represents a notification message sent to a customer or merchant
+/// @group Notification
+model Notification {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  type    NotificationType // e.g., BOOKING_CONFIRMED, REMINDER, PAYMENT_RECEIPT
+  channel NotificationChannel // EMAIL, SMS
+
+  recipient String // Email address or phone number
+  subject   String?
+  message   String
+
+  errorMessage String?
+  sentAt       DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notificationTemplateId String?
+  template               NotificationTemplate? @relation(fields: [notificationTemplateId], references: [id])
+  NotificationLog        NotificationLog[]
+
+  @@index([merchantId, type])
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([recipient])
+}
+
+enum NotificationType {
+  MERCHANT_USER_INVITE
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  BOOKING_REMINDER
+  BOOKING_UPDATED
+  PAYMENT_RECEIPT
+  REFUND_PROCESSED
+  REVIEW_REQUEST
+  WAITLIST_NOTIFICATION
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+  OPENED
+}
+
+/**
+ * PHASE 2: Advanced Booking Models (Add after MVP is working)
+ */
+
+/// ResourceTemplate: Represents a template for a resource type
+/// @group Inventory
+model ResourceTemplate {
+  id         String    @id @default(cuid())
+  merchantId String?
+  merchant   Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name        String
+  category    String
+  description String?
+
+  defaultFields Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Resource Resource[]
+
+  @@index([category])
+  @@index([merchantId])
+}
+
+/// ResourceBookingConfig: Represents the booking configuration for a resource
+/// @group Inventory
+model ResourceBookingConfig {
+  id         String   @id @default(cuid())
+  resourceId String   @unique
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  availableDays Json? // [{ day: "Monday", open: "09:00", close: "17:00" }]
+  blackoutDates Json? // ["2025-12-25", "2025-12-26"]
+
+  allowMultipleBookings Boolean @default(false)
+  enableWaitlist        Boolean @default(false)
+  autoConfirm           Boolean @default(true)
+
+  cancellationPolicyId String?
+  cancellationPolicy   CancellationPolicy? @relation(fields: [cancellationPolicyId], references: [id])
+
+  isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// AddOn: Represents an additional service or item that can be attached to a booking
+/// @group Inventory
+model AddOn {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name          String
+  description   String?
+  price         Decimal @db.Decimal(10, 2)
+  currency      String  @default("USD")
+  showInBooking Boolean @default(true)
+  isActive      Boolean @default(true)
+
+  // Inventory tracking for add-ons
+  hasInventory    Boolean @default(false)
+  inventoryCount  Int?
+  lowStockWarning Int?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  RateAddOn        RateAddOn[]
+  BookingItemAddOn BookingItemAddOn[]
+  BookingAddOn     BookingAddOn[]
+
+  @@index([merchantId, isActive])
+  @@index([hasInventory])
+}
+
+/// ResourceAsset: Represents an asset (image, file) associated with a resource
+/// @group Inventory
+model ResourceAsset {
+  id String @id @default(cuid())
+
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  assetId String
+  asset   MerchantAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  isPrimary Boolean @default(false)
+  sortOrder Int     @default(0)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([resourceId, assetId])
+  @@index([resourceId, isPrimary])
+}
+
+/// Discount: Represents a discount that can be applied to a rate
+/// @group Pricing
+model Discount {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  code        String? @unique
+  name        String
+  description String?
+
+  discountType DiscountType
+  amount       Decimal      @db.Decimal(10, 2)
+
+  appliesToRates Rate[]
+
+  // Usage tracking
+  usageLimit Int? // e.g., max 100 uses
+  usedCount  Int  @default(0)
+
+  // Customer restrictions
+  firstTimeCustomerOnly Boolean  @default(false)
+  minimumSpend          Decimal? @db.Decimal(10, 2)
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, isActive])
+  @@index([code])
+  @@index([startDate, endDate])
+  @@index([firstTimeCustomerOnly])
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+  BUY_X_GET_Y
+  BULK_DISCOUNT
+}
+
+/// RateAddOn: Represents an add-on that can be attached to a rate
+/// @group Pricing
+model RateAddOn {
+  id      String @id @default(cuid())
+  rateId  String
+  addOnId String
+
+  rate  Rate  @relation(fields: [rateId], references: [id], onDelete: Cascade)
+  addOn AddOn @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+
+  isRequired Boolean   @default(false)
+  isDeleted  Boolean   @default(false)
+  deletedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([rateId, addOnId])
+}
+
+/// BookingTemplate: Represents a template for a booking flow
+/// @group BookingConfiguration
+model BookingTemplate {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name          String
+  description   String?
+  selectionMode SelectionMode
+  config        Json
+  actions       BookingAction[]
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  BookingRequest BookingRequest[]
+
+  @@index([merchantId])
+}
+
+/// BookingAction: Represents a step or action in a booking flow
+/// @group BookingConfiguration
+model BookingAction {
+  id                String          @id @default(cuid())
+  bookingTemplateId String
+  bookingTemplate   BookingTemplate @relation(fields: [bookingTemplateId], references: [id], onDelete: Cascade)
+
+  name     String
+  type     ActionType
+  config   Json
+  required Boolean    @default(true)
+  order    Int        @default(0)
+
+  BookingRequestActionValue BookingRequestActionValue[]
+  isDeleted                 Boolean                     @default(false)
+  deletedAt                 DateTime?
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+
+  @@index([bookingTemplateId, order])
+}
+
+/// UiTemplate: Represents a template for the booking UI
+/// @group BookingConfiguration
+model UiTemplate {
+  id              String  @id @default(cuid())
+  name            String
+  description     String?
+  previewImageUrl String?
+  isSystem        Boolean @default(false)
+
+  merchantId String?
+  merchant   Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  config     Json
+
+  uiTheme String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingRequestFlow BookingRequestFlow[]
+
+  @@index([merchantId])
+  @@index([isSystem])
+}
+
+enum SelectionMode {
+  SINGLE
+  MULTI
+}
+
+enum ActionType {
+  DATE_SELECT
+  TIME_SELECT
+  RESOURCE_SELECT
+  CUSTOMER_DETAILS
+  ADD_ON_SELECT
+  INPUT_FIELD
+  PAYMENT_SELECT
+  TERMS_ACCEPTANCE
+}
+
+/// BookingRequest: Represents a booking request made by a customer
+/// @group BookingSetup
+model BookingRequest {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  prefilledFields Json?
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  resourceId String?
+  resource   Resource? @relation(fields: [resourceId], references: [id])
+
+  templateId String
+  template   BookingTemplate @relation(fields: [templateId], references: [id])
+
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
+
+  notes String?
+
+  status            BookingRequestStatus
+  actionStatus      Json
+  finalizedSnapshot Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  BookingRequestFlow        BookingRequestFlow[]
+  BookingRequestActionValue BookingRequestActionValue[]
+  Booking                   Booking[]
+
+  @@index([merchantId, status])
+  @@index([templateId])
+  @@index([customerId])
+  @@index([expiresAt])
+}
+
+/// BookingRequestActionValue: Represent the state of a booking action in a request
+/// @group BookingSetup
+model BookingRequestActionValue {
+  id               String         @id @default(cuid())
+  bookingRequestId String
+  bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id], onDelete: Cascade)
+
+  bookingActionId String
+  bookingAction   BookingAction @relation(fields: [bookingActionId], references: [id], onDelete: Cascade)
+
+  value       Json
+  completedAt DateTime  @default(now())
+  isDeleted   Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([bookingRequestId, bookingActionId])
+}
+
+enum BookingRequestStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+/// BookingRequestFlow: Represents a flow that can be shared for booking
+/// @group BookingSetup
+model BookingRequestFlow {
+  id               String         @id @default(cuid())
+  bookingRequestId String
+  bookingRequest   BookingRequest @relation(fields: [bookingRequestId], references: [id], onDelete: Cascade)
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  uiTemplateId String
+  uiTemplate   UiTemplate @relation(fields: [uiTemplateId], references: [id])
+
+  slug String @unique
+
+  usageLimit Int?
+  usageCount Int  @default(0)
+
+  webhookUrl    String?
+  webhookEvents Json?
+
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([merchantId])
+  @@index([expiresAt])
+}
+
+/// BookingItem: Represents a single item in a booking
+/// @group Booking
+model BookingItem {
+  id String @id @default(cuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  startTime DateTime
+  endTime   DateTime
+
+  currentStatus BookingItemStatus
+
+  bookingRateSnapshotId String
+  bookingRateSnapshot   BookingRateSnapshot @relation(fields: [bookingRateSnapshotId], references: [id])
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  BookingItemAddOn      BookingItemAddOn[]
+  CancellationRequest   CancellationRequest[]
+  BookingItemTransition BookingItemTransition[]
+
+  @@index([bookingId])
+  @@index([startTime, endTime])
+  @@index([currentStatus])
+}
+
+/// BookingItemAddOn: Represents an add-on attached to a booking item
+/// @group Booking
+model BookingItemAddOn {
+  id String @id @default(cuid())
+
+  bookingItemId String
+  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  addOnId String
+  addOn   AddOn  @relation(fields: [addOnId], references: [id])
+
+  addOnName  String
+  unitPrice  Decimal @db.Decimal(10, 2)
+  quantity   Int     @default(1)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingItemId])
+}
+
+/// BookingItemTransition: Represents a change in the status of a booking item
+/// @group Booking
+model BookingItemTransition {
+  id String @id @default(cuid())
+
+  bookingItemId String
+  bookingItem   BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  fromStatus BookingItemStatus
+  toStatus   BookingItemStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingItemId])
+  @@index([createdAt])
+}
+
+enum BookingItemStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  FAILED
+  WAITLISTED
+  IN_USE
+  NO_SHOW
+}
+
+/// BookingAddOn: Represents an add-on attached to a booking
+/// @group Booking
+model BookingAddOn {
+  id String @id @default(cuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  addOnId String?
+  addOn   AddOn?  @relation(fields: [addOnId], references: [id])
+
+  addOnName  String
+  quantity   Int     @default(1)
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+}
+
+/// BookingTransition: Represents a change in the status of a booking
+/// @group Booking
+model BookingTransition {
+  id String @id @default(cuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  fromStatus BookingStatus
+  toStatus   BookingStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([createdAt])
+}
+
+/// CancellationPolicy: Represents a policy for booking cancellations
+/// @group Booking
+model CancellationPolicy {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name           String
+  description    String?
+  refundType     RefundType
+  refundAmount   Decimal?   @db.Decimal(5, 2)
+  timeLimitHours Int?
+
+  appliesTo CancellationScope @default(BOOKING)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ResourceBookingConfig ResourceBookingConfig[]
+
+  @@index([merchantId])
+}
+
+enum RefundType {
+  FULL
+  PARTIAL
+  NONE
+  SLIDING_SCALE
+}
+
+enum CancellationScope {
+  BOOKING
+  ITEM
+}
+
+/// CancellationRequest: Represents a request to cancel a booking
+/// @group Booking
+model CancellationRequest {
+  id String @id @default(cuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  bookingItemId String?
+  bookingItem   BookingItem? @relation(fields: [bookingItemId], references: [id])
+
+  requestedBy String?
+  reason      String?
+  source      CancellationSource @default(CUSTOMER)
+
+  currentStatus CancellationStatus @default(PENDING)
+
+  processedAt DateTime?
+  approvedBy  String?
+  approvedAt  DateTime?
+  declinedAt  DateTime?
+
+  refundAmount Decimal? @db.Decimal(10, 2)
+  notes        String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CancellationRequestTransition CancellationRequestTransition[]
+
+  @@index([bookingId])
+  @@index([currentStatus])
+}
+
+/// CancellationRequestTransition: Represents a change in the status of a cancellation request
+/// @group Booking
+model CancellationRequestTransition {
+  id String @id @default(cuid())
+
+  cancellationRequestId String
+  cancellationRequest   CancellationRequest @relation(fields: [cancellationRequestId], references: [id], onDelete: Cascade)
+
+  fromStatus CancellationStatus
+  toStatus   CancellationStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cancellationRequestId])
+}
+
+enum CancellationStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELLED
+}
+
+enum CancellationSource {
+  CUSTOMER
+  SUPPORT
+  SYSTEM
+}
+
+/// WaitlistEntry: Represents a customer waiting for a resource
+/// @group Waitlist
+model WaitlistEntry {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  desiredStartTime DateTime?
+  desiredEndTime   DateTime?
+  partySize        Int       @default(1)
+
+  currentStatus WaitlistStatus @default(ACTIVE)
+
+  notes String?
+
+  priority Int @default(0)
+
+  notifiedAt DateTime?
+  promotedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  WaitlistEntryTransition WaitlistEntryTransition[]
+
+  @@index([merchantId, resourceId, currentStatus])
+  @@index([priority])
+  @@index([desiredStartTime, desiredEndTime])
+}
+
+/// WaitlistEntryTransition: Represents a change in the status of a waitlist entry
+/// @group Waitlist
+model WaitlistEntryTransition {
+  id String @id @default(cuid())
+
+  waitlistEntryId String
+  waitlistEntry   WaitlistEntry @relation(fields: [waitlistEntryId], references: [id], onDelete: Cascade)
+
+  fromStatus WaitlistStatus
+  toStatus   WaitlistStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([waitlistEntryId])
+}
+
+enum WaitlistStatus {
+  ACTIVE
+  CANCELLED
+  NOTIFIED
+  PROMOTED
+  EXPIRED
+}
+
+/**
+ * PHASE 2: Payment and Invoicing Models
+ */
+
+/// Invoice: Represents an invoice for a booking or payment
+/// @group Payment
+model Invoice {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  invoiceNumber String @unique
+  currency      String @default("USD")
+
+  subtotal       Decimal @db.Decimal(10, 2)
+  taxAmount      Decimal @db.Decimal(10, 2)
+  discountAmount Decimal @db.Decimal(10, 2)
+  totalAmount    Decimal @db.Decimal(10, 2)
+
+  status    InvoiceStatus @default(PENDING)
+  issueDate DateTime
+  dueDate   DateTime?
+  paidAt    DateTime?
+
+  notes  String?
+  pdfUrl String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  InvoicePayment InvoicePayment[]
+  InvoiceItem    InvoiceItem[]
+  InvoiceHistory InvoiceHistory[]
+
+  @@index([merchantId, status])
+  @@index([invoiceNumber])
+  @@index([customerId])
+  @@index([issueDate])
+}
+
+/// InvoiceItem: Represents an item in an invoice
+/// @group Payment
+model InvoiceItem {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  amount      Decimal @db.Decimal(10, 2)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+}
+
+/// InvoiceHistory: Represents a history of changes to an invoice
+/// @group Payment
+model InvoiceHistory {
+  id String @id @default(cuid())
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  fromStatus InvoiceStatus
+  toStatus   InvoiceStatus
+  reason     String?
+  notes      String?
+  metadata   Json?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+}
+
+enum InvoiceStatus {
+  PENDING
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+/// InvoicePayment: Represents a payment made against an invoice
+/// @group Payment
+model InvoicePayment {
+  id        String  @id @default(cuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  paymentId String
+  payment   PaymentActions @relation(fields: [paymentId], references: [id])
+
+  amountPaid Decimal   @db.Decimal(10, 2)
+  paidAt     DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceId])
+  @@index([paymentId])
+}
+
+/// RefundRequest: Represents a request for refunding a payment
+/// @group Payment
+model RefundRequest {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  paymentTransactionId String
+  paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
+
+  amount   Decimal @db.Decimal(10, 2)
+  currency String  @default("USD")
+
+  reason String?
+  status RefundRequestStatus @default(PENDING)
+
+  approvedBy String?
+  approvedAt DateTime?
+  rejectedAt DateTime?
+
+  requestedBy String?
+  requestedAt DateTime @default(now())
+
+  processedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  RefundLog RefundLog[]
+
+  @@index([merchantId, status])
+  @@index([bookingId])
+  @@index([requestedAt])
+}
+
+enum RefundRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+/// RefundLog: Represents a log entry for a refund transaction
+/// @group Payment
+model RefundLog {
+  id String @id @default(cuid())
+
+  refundRequestId String
+  refundRequest   RefundRequest @relation(fields: [refundRequestId], references: [id], onDelete: Cascade)
+
+  paymentTransactionId String
+  paymentTransaction   PaymentActions @relation(fields: [paymentTransactionId], references: [id])
+
+  amount   Decimal @db.Decimal(10, 2)
+  currency String  @default("USD")
+
+  provider         String
+  providerRefundId String
+
+  status       RefundStatus @default(PENDING)
+  errorMessage String?
+
+  processedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([refundRequestId])
+  @@index([providerRefundId])
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+/**
+ * PHASE 2: Advanced Notification Models
+ */
+
+/// NotificationTemplate: Represents a template for a notification message
+/// @group Notification
+model NotificationTemplate {
+  id         String              @id @default(cuid())
+  merchantId String
+  type       NotificationType
+  channel    NotificationChannel
+
+  subject String
+  body    String
+
+  // Template variables available for substitution
+  variables Json? // ["{{customerName}}", "{{bookingDate}}"]
+
+  isActive Boolean @default(true)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Notification Notification[]
+
+  @@unique([merchantId, type, channel])
+  @@index([merchantId, type])
+}
+
+/// NotificationLog: Represents a log entry for a notification message
+/// @group Notification
+model NotificationLog {
+  id String @id @default(cuid())
+
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  status NotificationStatus
+
+  errorMessage String?
+  deliveredAt  DateTime?
+  openedAt     DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([notificationId])
+  @@index([status])
+}
+
+/**
+ * PHASE 2: Analytics and Logging Models
+ */
+
+/// ApiUsageLog: Represents a log entry for API usage
+/// @group Events
+model ApiUsageLog {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  endpoint   String
+  method     String
+  statusCode Int
+
+  ipAddress String?
+  userAgent String?
+
+  responseTimeMs    Int
+  rateLimitExceeded Boolean @default(false)
+
+  requestSize  Int? // bytes
+  responseSize Int? // bytes
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([merchantId, createdAt])
+  @@index([apiKeyId, createdAt])
+  @@index([endpoint, method])
+  @@index([statusCode])
+}
+
+/// ApiUsageStat: Represents a daily usage summary for an API key
+/// @group Events
+model ApiUsageStat {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  date          DateTime @db.Date
+  requestCount  Int
+  successCount  Int
+  errorCount    Int
+  rateLimitHits Int
+
+  averageResponseTime Decimal? @db.Decimal(8, 2)
+  totalDataTransfer   BigInt? // bytes
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([apiKeyId, date])
+  @@index([merchantId, date])
+}
+
+/// BookingActivityLog: Represents a log entry for booking activity
+/// @group Events
+model BookingActivityLog {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  userId       String?
+  systemAction Boolean @default(false)
+
+  action        BookingActionType
+  previousValue String?
+  newValue      String?
+
+  description String?
+  ipAddress   String?
+  userAgent   String?
+
+  performedAt DateTime @default(now())
+  performedBy String?
+
+  createdAt DateTime @default(now())
+
+  @@index([merchantId, performedAt])
+  @@index([bookingId, performedAt])
+  @@index([action])
+}
+
+enum BookingActionType {
+  CREATED
+  UPDATED
+  CANCELLED
+  STATUS_CHANGED
+  PAYMENT_UPDATED
+  CUSTOMER_NOTIFIED
+  REFUNDED
+  CHECKED_IN
+  CHECKED_OUT
+  NO_SHOW_MARKED
+}
+
+/// AuditLog: Represents a log entry for merchant activity
+/// @group Events
+model AuditLog {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  userId       String?
+  action       String
+  resourceType String
+  resourceId   String?
+
+  description String?
+
+  ipAddress String?
+  userAgent String?
+
+  performedAt DateTime @default(now())
+  performedBy String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([merchantId, performedAt])
+  @@index([resourceType, resourceId])
+  @@index([action])
+}
+
+/**
+ * PHASE 2: Webhook Models
+ */
+
+/// WebhookEndpoint: Represents a webhook URL for event notifications
 /// @group Developers
 model WebhookEndpoint {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   name   String
   url    String
-  secret String // Used to sign payloads
-  events Json // ["booking.created", "payment.successful"]
+  secret String
+  events Json
 
   isActive Boolean @default(true)
 
@@ -1661,19 +2153,21 @@ model WebhookEndpoint {
   updatedAt DateTime @updatedAt
 
   WebhookEvent WebhookEvent[]
+
+  @@index([merchantId, isActive])
 }
 
-// WebhookEvent: Represents an event to be sent to a webhook endpoint
+/// WebhookEvent: Represents an event to be sent to a webhook endpoint
 /// @group Developers
 model WebhookEvent {
   id         String   @id @default(cuid())
   merchantId String
-  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 
   endpointId String
   endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id])
 
-  eventType WebhookEventType // e.g., BOOKING_CREATED
+  eventType WebhookEventType
   payload   Json
 
   status       WebhookEventStatus @default(PENDING)
@@ -1682,6 +2176,7 @@ model WebhookEvent {
   errorMessage String?
 
   retryCount  Int       @default(0)
+  maxRetries  Int       @default(3)
   nextRetryAt DateTime?
 
   sentAt DateTime?
@@ -1693,32 +2188,387 @@ model WebhookEvent {
   updatedAt DateTime @updatedAt
 
   WebhookEventLog WebhookEventLog[]
+
+  @@index([merchantId, status])
+  @@index([endpointId, status])
+  @@index([nextRetryAt])
+  @@index([eventType])
 }
 
 enum WebhookEventType {
   BOOKING_CREATED
   BOOKING_UPDATED
+  BOOKING_CANCELLED
+  BOOKING_COMPLETED
   PAYMENT_SUCCESSFUL
+  PAYMENT_FAILED
+  REFUND_PROCESSED
+  CUSTOMER_CREATED
+  RESOURCE_UPDATED
+  AVAILABILITY_CHANGED
+  WAITLIST_PROMOTED
 }
 
 enum WebhookEventStatus {
   PENDING
   SENT
   FAILED
+  ABANDONED
 }
 
-// The actual log of webhook events sent
+/// WebhookEventLog: Represents the actual log of webhook events sent
 /// @group Developers
 model WebhookEventLog {
   id           String       @id @default(cuid())
   eventId      String
-  webhookEvent WebhookEvent @relation(fields: [eventId], references: [id])
+  webhookEvent WebhookEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   attemptNumber Int
   responseCode  Int
   responseBody  String?
   errorMessage  String?
+  responseTime  Int? // milliseconds
 
   sentAt    DateTime
   createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@index([sentAt])
+  @@index([responseCode])
 }
+
+/**
+ * PHASE 3: App Marketplace Models (Advanced Integration Features)
+ */
+
+/// App: Represents a third-party app or integration
+/// @group App
+model App {
+  id String @id @default(cuid())
+
+  name        String
+  description String?
+  logoUrl     String?
+  websiteUrl  String?
+  category    String? // "Payment", "Calendar", "CRM", etc.
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  clientId     String? @unique
+  clientSecret String?
+
+  redirectUrls Json?
+  webhookUrl   String?
+
+  scopes Json?
+
+  isPublic    Boolean @default(false)
+  isPublished Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  // App versioning
+  version    String  @default("1.0.0")
+  minVersion String? // Minimum compatible version
+
+  // Rate limiting for app
+  rateLimitPerHour Int? @default(1000)
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AppInstall AppInstall[]
+  OAuthToken OAuthToken[]
+
+  @@index([merchantId])
+  @@index([isPublic, isPublished])
+  @@index([category])
+}
+
+/// AppInstall: Represents an installed instance of an app
+/// @group App
+model AppInstall {
+  id String @id @default(cuid())
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  appId String
+  app   App    @relation(fields: [appId], references: [id])
+
+  status AppInstallStatus @default(PENDING)
+
+  // Configuration specific to this installation
+  config Json?
+
+  installedAt   DateTime?
+  uninstalledAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AppInstallScope AppInstallScope[]
+
+  @@unique([merchantId, appId])
+  @@index([merchantId, status])
+}
+
+enum AppInstallStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  UNINSTALLED
+  ERROR
+}
+
+/// AppScope: Represents a permission scope for an app
+/// @group App
+model AppScope {
+  id String @id @default(cuid())
+
+  name        String  @unique
+  description String?
+  category    String? // "read", "write", "admin"
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  AppInstallScope AppInstallScope[]
+
+  @@index([category])
+}
+
+/// AppInstallScope: Represents a granted scope for an app install
+/// @group App
+model AppInstallScope {
+  id String @id @default(cuid())
+
+  appInstallId String
+  appInstall   AppInstall @relation(fields: [appInstallId], references: [id], onDelete: Cascade)
+
+  scopeId String
+  scope   AppScope @relation(fields: [scopeId], references: [id])
+
+  grantedAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([appInstallId, scopeId])
+}
+
+/// OAuthToken: Represents an OAuth token for an app install
+/// @group App
+model OAuthToken {
+  id String @id @default(cuid())
+
+  appId String
+  app   App    @relation(fields: [appId], references: [id])
+
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  accessToken  String    @unique
+  refreshToken String?   @unique
+  tokenType    String    @default("Bearer")
+  expiresAt    DateTime?
+
+  scopes Json?
+
+  isRevoked Boolean   @default(false)
+  revokedAt DateTime?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([appId, merchantId])
+  @@index([accessToken])
+  @@index([expiresAt])
+  @@index([isRevoked])
+}
+
+/**
+ * Advanced Search & Analytics Models
+ */
+
+/// SavedSearch: Represents saved search queries
+/// @group Search
+model SavedSearch {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name       String
+  searchType String // "bookings", "customers", "resources"
+  query      Json // Search parameters
+  isShared   Boolean @default(false)
+
+  createdBy String // User ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, searchType])
+  @@index([createdBy])
+}
+
+/// ReportTemplate: Custom report templates
+/// @group Analytics
+model ReportTemplate {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  reportType  String // "revenue", "bookings", "customers"
+  config      Json // Report configuration
+  schedule    Json? // Automated report schedule
+
+  isActive Boolean @default(true)
+
+  createdBy String // User ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ReportExecution ReportExecution[]
+
+  @@index([merchantId, reportType])
+}
+
+/// ReportExecution: Track report generation
+/// @group Analytics
+model ReportExecution {
+  id         String         @id @default(cuid())
+  templateId String
+  template   ReportTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  status     String  @default("pending") // "pending", "running", "completed", "failed"
+  reportUrl  String? // URL to generated report
+  parameters Json? // Report parameters used
+  errorLog   String?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdBy String // User ID
+
+  createdAt DateTime @default(now())
+
+  @@index([templateId, status])
+  @@index([createdAt])
+}
+
+/**
+ * Security & Compliance Models
+ */
+
+/// SecurityLog: Security-related events
+/// @group Security
+model SecurityLog {
+  id         String    @id @default(cuid())
+  merchantId String?
+  merchant   Merchant? @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  eventType   String // "login_attempt", "api_key_created", "suspicious_activity"
+  severity    String // "low", "medium", "high", "critical"
+  description String
+
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([merchantId, eventType])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+/// DataRetentionPolicy: Data retention and deletion policies
+/// @group Compliance
+model DataRetentionPolicy {
+  id         String   @id @default(cuid())
+  merchantId String
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  dataType        String // "bookings", "customers", "logs"
+  retentionPeriod Int // days
+  isActive        Boolean @default(true)
+
+  lastRunAt DateTime?
+  nextRunAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([merchantId, dataType])
+  @@index([nextRunAt, isActive])
+}
+
+/**
+ * Additional relationships for enhanced models
+ */
+
+/**
+ * Views for Analytics (PostgreSQL Views)
+ */
+
+// Note: These would be created as database views, not Prisma models
+// Including here for reference of what analytics data would be available
+
+/**
+ * VIEW booking_summary AS
+ * SELECT
+ * merchantId,
+ * DATE(createdAt) as booking_date,
+ * COUNT(*) as total_bookings,
+ * COUNT(CASE WHEN currentStatus = 'CONFIRMED' THEN 1 END) as confirmed_bookings,
+ * COUNT(CASE WHEN currentStatus = 'CANCELLED' THEN 1 END) as cancelled_bookings,
+ * SUM(totalPrice) as total_revenue,
+ * AVG(totalPrice) as average_booking_value
+ * FROM "Booking"
+ * GROUP BY merchantId, DATE(createdAt);
+ * VIEW resource_utilization AS
+ * SELECT
+ * r.merchantId,
+ * r.id as resourceId,
+ * r.name as resourceName,
+ * r.capacity,
+ * COUNT(b.id) as total_bookings,
+ * SUM(b.partySize) as total_guests,
+ * (SUM(b.partySize) * 100.0 / (r.capacity * COUNT(DISTINCT DATE(b.startTime)))) as utilization_rate
+ * FROM "Resource" r
+ * LEFT JOIN "Booking" b ON r.id = b.resourceId AND b.currentStatus = 'CONFIRMED'
+ * GROUP BY r.merchantId, r.id, r.name, r.capacity;
+ * VIEW customer_lifetime_value AS
+ * SELECT
+ * c.merchantId,
+ * c.id as customerId,
+ * c.name,
+ * c.email,
+ * COUNT(b.id) as total_bookings,
+ * SUM(b.totalPrice) as lifetime_value,
+ * AVG(b.totalPrice) as average_booking_value,
+ * MIN(b.createdAt) as first_booking,
+ * MAX(b.createdAt) as last_booking
+ * FROM "Customer" c
+ * LEFT JOIN "Booking" b ON c.id = b.customerId
+ * GROUP BY c.merchantId, c.id, c.name, c.email;
+ */

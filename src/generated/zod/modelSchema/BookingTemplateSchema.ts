@@ -7,6 +7,7 @@ import { SelectionModeSchema } from '../inputTypeSchemas/SelectionModeSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingTemplate: Represents a template for a booking flow
  * @group BookingConfiguration
  */
 export const BookingTemplateSchema = z.object({

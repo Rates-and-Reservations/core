@@ -8,6 +8,7 @@ import { CancellationScopeSchema } from '../inputTypeSchemas/CancellationScopeSc
 /////////////////////////////////////////
 
 /**
+ * CancellationPolicy: Represents a policy for booking cancellations
  * @group Booking
  */
 export const CancellationPolicySchema = z.object({

@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * App: Represents a third-party app or integration
  * @group App
  */
 export const AppSchema = z.object({
@@ -14,6 +15,7 @@ export const AppSchema = z.object({
   description: z.string().nullable(),
   logoUrl: z.string().nullable(),
   websiteUrl: z.string().nullable(),
+  category: z.string().nullable(),
   merchantId: z.string(),
   clientId: z.string().nullable(),
   clientSecret: z.string().nullable(),
@@ -23,6 +25,9 @@ export const AppSchema = z.object({
   isPublic: z.boolean(),
   isPublished: z.boolean(),
   isActive: z.boolean(),
+  version: z.string(),
+  minVersion: z.string().nullable(),
+  rateLimitPerHour: z.number().int().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

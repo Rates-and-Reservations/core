@@ -6,6 +6,7 @@ import { NotificationStatusSchema } from '../inputTypeSchemas/NotificationStatus
 /////////////////////////////////////////
 
 /**
+ * NotificationLog: Represents a log entry for a notification message
  * @group Notification
  */
 export const NotificationLogSchema = z.object({
@@ -13,6 +14,8 @@ export const NotificationLogSchema = z.object({
   id: z.string().cuid(),
   notificationId: z.string(),
   errorMessage: z.string().nullable(),
+  deliveredAt: z.coerce.date().nullable(),
+  openedAt: z.coerce.date().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

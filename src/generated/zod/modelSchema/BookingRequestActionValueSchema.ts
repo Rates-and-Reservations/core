@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingRequestActionValue: Represent the state of a booking action in a request
  * @group BookingSetup
  */
 export const BookingRequestActionValueSchema = z.object({

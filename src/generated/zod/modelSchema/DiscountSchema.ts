@@ -7,6 +7,7 @@ import { DiscountTypeSchema } from '../inputTypeSchemas/DiscountTypeSchema'
 /////////////////////////////////////////
 
 /**
+ * Discount: Represents a discount that can be applied to a rate
  * @group Pricing
  */
 export const DiscountSchema = z.object({
@@ -14,10 +15,13 @@ export const DiscountSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),
   code: z.string().nullable(),
+  name: z.string(),
   description: z.string().nullable(),
   amount: z.instanceof(Prisma.Decimal, { message: "Field 'amount' must be a Decimal. Location: ['Models', 'Discount']"}),
   usageLimit: z.number().int().nullable(),
   usedCount: z.number().int(),
+  firstTimeCustomerOnly: z.boolean(),
+  minimumSpend: z.instanceof(Prisma.Decimal, { message: "Field 'minimumSpend' must be a Decimal. Location: ['Models', 'Discount']"}).nullable(),
   startDate: z.coerce.date().nullable(),
   endDate: z.coerce.date().nullable(),
   isActive: z.boolean(),

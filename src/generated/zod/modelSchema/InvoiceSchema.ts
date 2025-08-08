@@ -7,6 +7,7 @@ import { InvoiceStatusSchema } from '../inputTypeSchemas/InvoiceStatusSchema'
 /////////////////////////////////////////
 
 /**
+ * Invoice: Represents an invoice for a booking or payment
  * @group Payment
  */
 export const InvoiceSchema = z.object({

@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * ApiUsageLog: Represents a log entry for API usage
  * @group Events
  */
 export const ApiUsageLogSchema = z.object({
@@ -18,6 +19,8 @@ export const ApiUsageLogSchema = z.object({
   userAgent: z.string().nullable(),
   responseTimeMs: z.number().int(),
   rateLimitExceeded: z.boolean(),
+  requestSize: z.number().int().nullable(),
+  responseSize: z.number().int().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

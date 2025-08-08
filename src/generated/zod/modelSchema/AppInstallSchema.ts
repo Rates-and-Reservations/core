@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 import { AppInstallStatusSchema } from '../inputTypeSchemas/AppInstallStatusSchema'
 
 /////////////////////////////////////////
@@ -6,6 +7,7 @@ import { AppInstallStatusSchema } from '../inputTypeSchemas/AppInstallStatusSche
 /////////////////////////////////////////
 
 /**
+ * AppInstall: Represents an installed instance of an app
  * @group App
  */
 export const AppInstallSchema = z.object({
@@ -13,6 +15,7 @@ export const AppInstallSchema = z.object({
   id: z.string().cuid(),
   merchantId: z.string(),
   appId: z.string(),
+  config: JsonValueSchema.nullable(),
   installedAt: z.coerce.date().nullable(),
   uninstalledAt: z.coerce.date().nullable(),
   isDeleted: z.boolean(),

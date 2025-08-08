@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * UiTemplate: Represents a template for the booking UI
  * @group BookingConfiguration
  */
 export const UiTemplateSchema = z.object({

@@ -7,6 +7,7 @@ import { BookingStatusSchema } from '../inputTypeSchemas/BookingStatusSchema'
 /////////////////////////////////////////
 
 /**
+ * BookingTransition: Represents a change in the status of a booking
  * @group Booking
  */
 export const BookingTransitionSchema = z.object({

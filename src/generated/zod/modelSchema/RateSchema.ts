@@ -8,6 +8,7 @@ import { TaxTypeSchema } from '../inputTypeSchemas/TaxTypeSchema'
 /////////////////////////////////////////
 
 /**
+ * Rate: Represents a pricing rate for a resource
  * @group Pricing
  */
 export const RateSchema = z.object({
@@ -24,10 +25,8 @@ export const RateSchema = z.object({
   isPublished: z.boolean(),
   isActive: z.boolean(),
   orderIndex: z.number().int(),
-  bookingStartDate: z.coerce.date().nullable(),
-  bookingEndDate: z.coerce.date().nullable(),
-  usageStartDate: z.coerce.date().nullable(),
-  usageEndDate: z.coerce.date().nullable(),
+  validFrom: z.coerce.date().nullable(),
+  validTo: z.coerce.date().nullable(),
   taxAmount: z.instanceof(Prisma.Decimal, { message: "Field 'taxAmount' must be a Decimal. Location: ['Models', 'Rate']"}),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

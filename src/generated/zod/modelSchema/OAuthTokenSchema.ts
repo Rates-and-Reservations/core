@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * OAuthToken: Represents an OAuth token for an app install
  * @group App
  */
 export const OAuthTokenSchema = z.object({
@@ -14,8 +15,11 @@ export const OAuthTokenSchema = z.object({
   merchantId: z.string(),
   accessToken: z.string(),
   refreshToken: z.string().nullable(),
+  tokenType: z.string(),
   expiresAt: z.coerce.date().nullable(),
   scopes: JsonValueSchema.nullable(),
+  isRevoked: z.boolean(),
+  revokedAt: z.coerce.date().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

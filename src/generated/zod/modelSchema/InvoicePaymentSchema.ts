@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client'
 /////////////////////////////////////////
 
 /**
+ * InvoicePayment: Represents a payment made against an invoice
  * @group Payment
  */
 export const InvoicePaymentSchema = z.object({

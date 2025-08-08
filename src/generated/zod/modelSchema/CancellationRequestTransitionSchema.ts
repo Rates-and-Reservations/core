@@ -7,6 +7,7 @@ import { CancellationStatusSchema } from '../inputTypeSchemas/CancellationStatus
 /////////////////////////////////////////
 
 /**
+ * CancellationRequestTransition: Represents a change in the status of a cancellation request
  * @group Booking
  */
 export const CancellationRequestTransitionSchema = z.object({

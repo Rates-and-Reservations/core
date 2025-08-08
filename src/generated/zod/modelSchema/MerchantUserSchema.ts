@@ -6,6 +6,7 @@ import { OrganisationRolesSchema } from '../inputTypeSchemas/OrganisationRolesSc
 /////////////////////////////////////////
 
 /**
+ * MerchantUser: Represents a user within the merchant's organisation
  * @group Merchant
  */
 export const MerchantUserSchema = z.object({

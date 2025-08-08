@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * ResourceAsset: Represents an asset (image, file) associated with a resource
  * @group Inventory
  */
 export const ResourceAssetSchema = z.object({

@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client'
 /////////////////////////////////////////
 
 /**
+ * BookingItemAddOn: Represents an add-on attached to a booking item
  * @group Booking
  */
 export const BookingItemAddOnSchema = z.object({

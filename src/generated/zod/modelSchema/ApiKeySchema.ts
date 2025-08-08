@@ -6,6 +6,7 @@ import { JsonValueSchema } from '../inputTypeSchemas/JsonValueSchema'
 /////////////////////////////////////////
 
 /**
+ * ApiKey: Represents an API key for merchant API access
  * @group Developers
  */
 export const ApiKeySchema = z.object({

@@ -5,6 +5,7 @@ import { z } from 'zod';
 /////////////////////////////////////////
 
 /**
+ * WebhookEventLog: Represents the actual log of webhook events sent
  * @group Developers
  */
 export const WebhookEventLogSchema = z.object({
@@ -14,6 +15,7 @@ export const WebhookEventLogSchema = z.object({
   responseCode: z.number().int(),
   responseBody: z.string().nullable(),
   errorMessage: z.string().nullable(),
+  responseTime: z.number().int().nullable(),
   sentAt: z.coerce.date(),
   createdAt: z.coerce.date(),
 })

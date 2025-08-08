@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { Prisma } from '@prisma/client'
 
 /////////////////////////////////////////
 // API USAGE STAT SCHEMA
 /////////////////////////////////////////
 
 /**
+ * ApiUsageStat: Represents a daily usage summary for an API key
  * @group Events
  */
 export const ApiUsageStatSchema = z.object({
@@ -16,6 +18,8 @@ export const ApiUsageStatSchema = z.object({
   successCount: z.number().int(),
   errorCount: z.number().int(),
   rateLimitHits: z.number().int(),
+  averageResponseTime: z.instanceof(Prisma.Decimal, { message: "Field 'averageResponseTime' must be a Decimal. Location: ['Models', 'ApiUsageStat']"}).nullable(),
+  totalDataTransfer: z.bigint().nullable(),
   isDeleted: z.boolean(),
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),

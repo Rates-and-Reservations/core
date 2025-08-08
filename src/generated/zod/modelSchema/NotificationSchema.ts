@@ -7,6 +7,7 @@ import { NotificationChannelSchema } from '../inputTypeSchemas/NotificationChann
 /////////////////////////////////////////
 
 /**
+ * Notification: Represents a notification message sent to a customer or merchant
  * @group Notification
  */
 export const NotificationSchema = z.object({
@@ -16,7 +17,6 @@ export const NotificationSchema = z.object({
   merchantId: z.string(),
   bookingId: z.string().nullable(),
   customerId: z.string().nullable(),
-  notificationTemplateId: z.string().nullable(),
   recipient: z.string(),
   subject: z.string().nullable(),
   message: z.string(),
@@ -26,6 +26,7 @@ export const NotificationSchema = z.object({
   deletedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  notificationTemplateId: z.string().nullable(),
 })
 
 export type Notification = z.infer<typeof NotificationSchema>

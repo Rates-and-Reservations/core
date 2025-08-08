@@ -6,6 +6,7 @@ import { BusinessTypeSchema } from '../inputTypeSchemas/BusinessTypeSchema'
 /////////////////////////////////////////
 
 /**
+ * Merchant: The main entity representing a business or organisation
  * @group Merchant
  */
 export const MerchantSchema = z.object({
@@ -20,6 +21,11 @@ export const MerchantSchema = z.object({
   logo: z.string().nullable(),
   industry: z.string(),
   category: z.string(),
+  timezone: z.string(),
+  locale: z.string(),
+  currency: z.string(),
+  dateFormat: z.string(),
+  timeFormat: z.string(),
   isVerified: z.boolean(),
   isActive: z.boolean(),
   verifiedAt: z.coerce.date().nullable(),
