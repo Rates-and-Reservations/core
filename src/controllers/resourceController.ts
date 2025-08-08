@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { successResponse, errorResponse, paginatedResponse } from '../utils/responses';
-import * as resourceService from '../services/resourceService';
-import logger from '../utils/logger';
+import { successResponse, errorResponse, paginatedResponse } from '@/utils/responses';
+import * as resourceService from '@/services/resourceService';
+import logger from '@/utils/logger';
 import { AuthenticatedRequest } from '@/types/api';
 
 export const createResource = async (req: AuthenticatedRequest, res: Response) => {

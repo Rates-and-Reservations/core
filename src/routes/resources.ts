@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { validateRequest } from '../middleware/validation';
-import { requireRole, requireMerchantAccess } from '../middleware/auth';
+import { validateRequest } from '@/middleware/validation';
+import { requireRole, requireMerchantAccess } from '@/middleware/auth';
 import * as resourceController from '@/controllers/resourceController';
 import { 
   createResourceSchema, 

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import app from './app';
-import logger from './utils/logger';
+import app from '@/app';
+import logger from '@/utils/logger';
 import { PrismaClient } from '@prisma/client';
 
 // Load environment variables

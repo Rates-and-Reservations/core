@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validateRequest } from '../middleware/validation';
-import { requireRole, requireMerchantAccess } from '../middleware/auth';
-import * as rateController from '../controllers/rateController';
+import { validateRequest } from '@/middleware/validation';
+import { requireRole, requireMerchantAccess } from '@/middleware/auth';
+import * as rateController from '@/controllers/rateController';
 import { 
   createRateSchema, 
   updateRateSchema,

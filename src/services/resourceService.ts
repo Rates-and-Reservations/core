@@ -1,5 +1,5 @@
-import { BlockType, ConstraintType, Prisma } from '@prisma/client';
-import prisma from '../config/database';
+import { Prisma } from '@prisma/client';
+import prisma from '@/config/database';
 import { 
   CreateResourceData, 
   UpdateResourceData,
@@ -14,7 +14,7 @@ import {
   AvailabilitySlot,
   CreateResourceAssetData,
   UpdateResourceAssetData
-} from '../types/resource';
+} from '@/types/resource';
 
 /**
  * Core Resource CRUD Operations

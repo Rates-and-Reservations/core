@@ -1,5 +1,4 @@
-import { RateDurationType } from '@prisma/client';
-import prisma from '../config/database';
+import prisma from '@/config/database';
 import { CreateRateData, UpdateRateData, RateQueryFilters, CreateAddOnData, UpdateAddOnData } from '@/types/rate';
 
 // Rate CRUD operations
