@@ -15,6 +15,8 @@ export const CustomerPreferenceSchema = z.object({
   value: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isDeleted: z.boolean(),
+  deletedAt: z.coerce.date().nullable(),
 })
 
 export type CustomerPreference = z.infer<typeof CustomerPreferenceSchema>
