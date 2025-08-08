@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { successResponse, errorResponse } from '@/utils/responses';
+import { successResponse, errorResponse, paginatedResponse } from '@/utils/responses';
 import * as rateService from '@/services/rateService';
 import logger from '@/utils/logger';
 import { AuthenticatedRequest } from '@/types/api';
@@ -30,8 +30,24 @@ export const getRates = async (req: AuthenticatedRequest, res: Response) => {
       return errorResponse(res, 'Merchant access required', 403);
     }
 
-    const rates = await rateService.getRates(req.merchant.id, req.query as any);
-    return successResponse(res, rates, 'Rates retrieved successfully');
+    const { page = 1, limit = 20, ...filters } = req.query as any;
+    
+    const result = await rateService.getRates(req.merchant.id, {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      ...filters,
+    });
+
+    return paginatedResponse(
+      res,
+      result.rates,
+      {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: result.total,
+      },
+      'Rates retrieved successfully'
+    );
   } catch (error) {
     logger.error('Get rates error:', error);
     return errorResponse(res, 'Failed to retrieve rates', 500);

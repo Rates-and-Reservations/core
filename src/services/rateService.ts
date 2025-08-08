@@ -47,7 +47,8 @@ export const createRate = async (merchantId: string, data: CreateRateData) => {
 };
 
 export const getRates = async (merchantId: string, filters: RateQueryFilters) => {
-  const { resourceId, isActive } = filters;
+  const { page, limit, resourceId, isActive } = filters;
+  const skip = (page - 1) * limit;
 
   const where: any = {
     merchantId,
@@ -62,32 +63,45 @@ export const getRates = async (merchantId: string, filters: RateQueryFilters) =>
     where.isActive = isActive;
   }
 
-  return prisma.rate.findMany({
-    where,
-    include: {
-      resource: {
-        select: {
-          id: true,
-          name: true,
+  const [rates, total] = await Promise.all([
+    prisma.rate.findMany({
+      where,
+      skip,
+      take: limit,
+      include: {
+        resource: {
+          select: {
+            id: true,
+            name: true,
+          },
         },
-      },
-      _count: {
-        select: {
-          Booking: {
-            where: {
-              isDeleted: false,
-              currentStatus: { in: ['PENDING', 'CONFIRMED'] },
+        _count: {
+          select: {
+            Booking: {
+              where: {
+                isDeleted: false,
+                currentStatus: { in: ['PENDING', 'CONFIRMED'] },
+              },
             },
           },
         },
       },
-    },
-    orderBy: [
-      { isDefault: 'desc' },
-      { orderIndex: 'asc' },
-      { createdAt: 'desc' },
-    ],
-  });
+      orderBy: [
+        { isDefault: 'desc' },
+        { orderIndex: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    }),
+    prisma.rate.count({ where }),
+  ]);
+
+  return { 
+    rates: rates.map(rate => ({
+      ...rate,
+      activeBookings: rate._count.Booking,
+    })),
+    total 
+  };
 };
 
 export const getRateById = async (rateId: string, merchantId: string) => {

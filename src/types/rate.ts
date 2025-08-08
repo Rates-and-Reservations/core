@@ -33,6 +33,8 @@ export interface UpdateRateData {
 }
 
 export interface RateQueryFilters {
+  page: number;
+  limit: number;
   resourceId?: string;
   isActive?: boolean;
 }

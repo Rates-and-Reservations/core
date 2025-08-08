@@ -50,6 +50,8 @@ export const updateRateSchema = z.object({
 });
 
 export const rateQuerySchema = z.object({
+  page: z.string().optional().default('1').transform(val => parseInt(val)),
+  limit: z.string().optional().default('20').transform(val => parseInt(val)),
   resourceId: z.string().optional(),
   isActive: z.string().optional().transform(val => val === 'true'),
 });
